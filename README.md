@@ -13,6 +13,7 @@ in your friends (people you are following) tweets...
 * **Python 3.4 or more** (older versions are not tested) and **pip**
 * **Having a (at least free) Twitter developer account** (https://developer.twitter.com/en/apply-for-access), to get the
  key, the token and their secrets, which are all required to access the Twitter API.
+* Don't forget to give **'Direct Message' permission** for your API.
 
 ## Installation
 * Clone the project repository on your machine.
