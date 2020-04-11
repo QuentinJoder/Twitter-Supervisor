@@ -3,6 +3,8 @@ config\.json
 *.db
 *.log
 drafts/
+virtualenv/
+venv/
 
 # IDE
 \.idea/
