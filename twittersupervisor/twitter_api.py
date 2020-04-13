@@ -1,4 +1,5 @@
 from twitter import Api, error
+import tweepy
 import logging
 
 
@@ -10,10 +11,15 @@ class TwitterApi:
     def __init__(self, twitter_credentials):
         try:
             self.username = twitter_credentials["username"]
+            # python-twitter
             self.api = Api(consumer_key=twitter_credentials["consumer_key"],
                            consumer_secret=twitter_credentials["consumer_secret"],
                            access_token_key=twitter_credentials["access_token"],
                            access_token_secret=twitter_credentials["access_token_secret"])
+            # tweepy
+            auth = tweepy.OAuthHandler(twitter_credentials["consumer_key"], twitter_credentials["consumer_secret"])
+            auth.set_access_token(twitter_credentials["access_token"], twitter_credentials["access_token_secret"])
+            self.tweepy_api = tweepy.API(auth)
         except KeyError as key_error:
             logging.critical("Invalid \"twitter_credentials\" argument: {}".format(key_error.args[0]))
             raise
@@ -55,6 +61,12 @@ class TwitterApi:
         except error.TwitterError as e:
             logging.critical('An error happened while looking up friendships: {}'.format(e.message))
             raise
+
+    def get_friendship_show(self, target_id):
+        try:
+            return self.tweepy_api.show_friendship(source_screen_name=self.username, target_id=target_id), None
+        except tweepy.TweepError as e:
+            return None, e
 
     def send_direct_message(self, text):
         logging.info('Sending direct message: \"{}\"'.format(text))
