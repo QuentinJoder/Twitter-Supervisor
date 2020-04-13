@@ -1,5 +1,5 @@
 import pytest
-from twitter import User, DirectMessage, TwitterError
+from twitter import User, DirectMessage, TwitterError, UserStatus
 from unittest import TestCase
 from twittersupervisor import ConfigFileParser, TwitterApi
 from tests import shared_test_data
@@ -39,6 +39,15 @@ class ApiTest(TestCase):
         self.assertIsInstance(user, User)
         self.assertEqual(user.name, 'Twitter')
         self.assertEqual(user.screen_name, 'Twitter')
+
+    @pytest.mark.api_call
+    def test_get_friendship_lookup(self):
+        friendships = self.twitter_api.get_friendship_lookup(shared_test_data.TWITTER_USER_ID)
+        self.assertIsInstance(friendships, list)
+        friendship = friendships[0]
+        self.assertIsInstance(friendship, UserStatus)
+        self.assertEqual(friendship.name, 'Twitter')
+        self.assertEqual(friendship.screen_name, 'Twitter')
 
     @pytest.mark.api_call
     def test_send_message(self):

@@ -49,6 +49,13 @@ class TwitterApi:
             logging.error('An error happened while searching for user n°{0}: {1}'.format(user_id, e.message))
             return None
 
+    def get_friendship_lookup(self, users_id):
+        try:
+            return self.api.LookupFriendship(users_id)
+        except error.TwitterError as e:
+            logging.critical('An error happened while looking up friendships: {}'.format(e.message))
+            raise
+
     def send_direct_message(self, text):
         logging.info('Sending direct message: \"{}\"'.format(text))
         try:
