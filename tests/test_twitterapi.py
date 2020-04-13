@@ -35,10 +35,11 @@ class ApiTest(TestCase):
 
     @pytest.mark.api_call
     def test_get_user(self):
-        user = self.twitter_api.get_user(shared_test_data.TWITTER_USER_ID)
+        user, error = self.twitter_api.get_user(shared_test_data.TWITTER_USER_ID)
         self.assertIsInstance(user, User)
         self.assertEqual(user.name, 'Twitter')
         self.assertEqual(user.screen_name, 'Twitter')
+        self.assertIsNone(error)
 
     @pytest.mark.api_call
     def test_get_friendship_lookup(self):

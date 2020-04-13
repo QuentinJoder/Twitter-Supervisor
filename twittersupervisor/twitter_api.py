@@ -44,10 +44,10 @@ class TwitterApi:
 
     def get_user(self, user_id):
         try:
-            return self.api.GetUser(user_id)
+            return self.api.GetUser(user_id), None
         except error.TwitterError as e:
             logging.error('An error happened while searching for user n°{0}: {1}'.format(user_id, e.message))
-            return None
+            return None, e.message
 
     def get_friendship_lookup(self, users_id):
         try:
