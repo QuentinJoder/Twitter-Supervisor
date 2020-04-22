@@ -1,15 +1,14 @@
 from unittest import TestCase, mock
 from argparse import Namespace
 from twitter import UserStatus
-from twittersupervisor import Messaging, TwitterApi, ConfigFileParser
+from twittersupervisor import Messaging, TwitterApi, Config
 from tests import shared_test_data
 
 
 class TestMessaging(TestCase):
 
     def setUp(self):
-        self.twitter_api = TwitterApi(ConfigFileParser(shared_test_data.COMPLETE_CONFIG_FILE)
-                                      .get_twitter_api_credentials())
+        self.twitter_api = TwitterApi(Config(shared_test_data.COMPLETE_CONFIG_FILE).twitter_credentials)
 
     def test_announce_follow_event_use_correct_media(self):
         with mock.patch('twittersupervisor.TwitterApi.get_friendship_lookup') as get_lookup:

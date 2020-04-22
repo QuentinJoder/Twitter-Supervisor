@@ -3,7 +3,7 @@ import argparse
 import logging
 import os.path
 # Custom dependencies
-from twittersupervisor import ConfigFileParser, Database, Messaging, TwitterApi
+from twittersupervisor import Config, Database, Messaging, TwitterApi
 import logging_config
 
 # Default values
@@ -40,26 +40,25 @@ if args.config:
     else:
         logging.critical("Incorrect argument: \"{}\" is not a file or does not exist.".format(args.config[0]))
         quit(1)
-config = ConfigFileParser(config_file_name)
-
-# Twitter API
 try:
-    twitter_api = TwitterApi(config.get_twitter_api_credentials())
+    config = Config(config_file_name)
 except KeyError as e:
     logging.critical(e.args[0])
     raise
+
+# Twitter API
+twitter_api = TwitterApi(config.twitter_credentials)
 if twitter_api.verify_credentials() is None:
     logging.critical("The Twitter API credentials in {} are not valid. Twitter Supervisor can not query the Twitter "
                      "API and work properly without correct credentials.".format(config.config_file_name))
     quit(2)
 
 # Database
-database = None
 if args.database:
     # TODO check if database file name is valid (end with .db, no weird character...)
     database = Database(args.database[0])
 else:
-    database = Database(config.get_database_filename())
+    database = Database(config.database_name)
 
 logging.debug("Configuration loaded from: {}".format(config.config_file_name))
 logging.debug("Data saved in: {}".format(database.database_name))

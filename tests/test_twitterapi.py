@@ -1,7 +1,7 @@
 import pytest
 from twitter import User, DirectMessage, TwitterError, UserStatus
 from unittest import TestCase
-from twittersupervisor import ConfigFileParser, TwitterApi
+from twittersupervisor import Config, TwitterApi
 from tests import shared_test_data
 
 
@@ -13,7 +13,7 @@ class ApiTest(TestCase):
 
     def setUp(self):
         if self._testMethodName != 'test_init':
-            self.twitter_api = TwitterApi(ConfigFileParser(ApiTest.CONFIG_FILE).get_twitter_api_credentials())
+            self.twitter_api = TwitterApi(Config(ApiTest.CONFIG_FILE).twitter_credentials)
 
     def test_init(self):
         self.assertRaises(TypeError, TwitterApi, None)
@@ -23,8 +23,7 @@ class ApiTest(TestCase):
     def test_verify_credentials(self):
         user = self.twitter_api.verify_credentials()
         self.assertIsInstance(user, User)
-        invalid_twitter_api = TwitterApi(ConfigFileParser(shared_test_data.COMPLETE_CONFIG_FILE)
-                                         .get_twitter_api_credentials())
+        invalid_twitter_api = TwitterApi(Config(shared_test_data.COMPLETE_CONFIG_FILE).twitter_credentials)
         with pytest.raises(TwitterError):
             invalid_twitter_api.verify_credentials()
 
