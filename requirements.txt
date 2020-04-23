@@ -1,3 +1,5 @@
 python-twitter
 pytest
 tweepy
+celery
+redis

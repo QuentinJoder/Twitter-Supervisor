@@ -44,12 +44,12 @@ class Database:
     @staticmethod
     def id_generator(followers_set):
         for user_id in followers_set:
-            yield (user_id,)
+            yield user_id,
 
     @staticmethod
     def event_generator(users_set, true):
         for user_id in users_set:
             if true:
-                yield (user_id, datetime.today().isoformat(), 1,)
+                yield user_id, datetime.today().isoformat(), 1,
             else:
-                yield (user_id, datetime.today().isoformat(), 0,)
+                yield user_id, datetime.today().isoformat(), 0,

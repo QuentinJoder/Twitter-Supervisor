@@ -3,9 +3,9 @@ import logging
 
 class Messaging:
 
-    def __init__(self, api, args):
+    def __init__(self, api, quiet):
         self.twitter_api = api
-        self.args = args
+        self.quiet = quiet
 
     # TODO i18n of the messages ?
     def announce_follow_event(self, following, user_ids):
@@ -62,7 +62,7 @@ class Messaging:
                 self.publish_message(message)
 
     def publish_message(self, message):
-        if self.args.quiet:
+        if self.quiet:
             logging.info(message)
         else:
             self.twitter_api.send_direct_message(message)

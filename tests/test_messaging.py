@@ -1,5 +1,4 @@
 from unittest import TestCase, mock
-from argparse import Namespace
 from twitter import UserStatus
 from twittersupervisor import Messaging, TwitterApi, Config
 from tests import shared_test_data
@@ -15,11 +14,11 @@ class TestMessaging(TestCase):
             get_lookup.return_value = [UserStatus(id=783214, name="Twitter", screen_name="twitter")]
             with mock.patch('twittersupervisor.TwitterApi.send_direct_message', unsafe=True) as send_dm:
                 # Case quiet
-                self.messaging = Messaging(self.twitter_api, Namespace(quiet=True))
+                self.messaging = Messaging(self.twitter_api, True)
                 self.messaging.announce_follow_event(True, [shared_test_data.TWITTER_USER_ID])
                 send_dm.assert_not_called()
                 # Case "not quiet"
-                self.messaging.args = Namespace(quiet=False)
+                self.messaging = Messaging(self.twitter_api, False)
                 self.messaging.announce_follow_event(True, [shared_test_data.TWITTER_USER_ID])
                 send_dm.assert_called_once()
 
