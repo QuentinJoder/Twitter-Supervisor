@@ -67,33 +67,59 @@ logging.debug("Username: {}".format(twitter_api.username))
 
 # Main function---------------------------------------------------------------------------------------------------------
 
-# Retrieve the previous followers set
-previous_followers = database.get_previous_followers_set()
-previous_followers_number = len(previous_followers)
-
 # Get the current followers set
-current_followers = twitter_api.get_followers_set()
-followers_number = len(current_followers)
+current_followers_set = twitter_api.get_followers_set()
+followers_number = len(current_followers_set)
 logging.info("Current number of followers: {}".format(followers_number))
 
-# Comparison of the two sets of followers
-new_followers = current_followers - previous_followers
-traitors = previous_followers - current_followers
+# If the database file does not exist, we consider it is the first use of the app
+if os.path.isfile(database.database_name) is False:
+    print("Thank you for using Twitter Supervisor, we are saving your current followers list...")
+    database.create_tables()
+    database.update_followers_list(current_followers_set, set())
+    print("Done ! You can now rerun the program later to know who start or stop following you.")
 
-# If there are no followers saved in DB, we consider it is the first use
-if previous_followers_number == 0:
-    print("Thank you for using Twitter Supervisor, we are saving your followers for later use of the program...")
 else:
+    # Retrieve the previous followers set
+    previous_followers_set = database.get_previous_followers_set()
+    previous_followers_number = len(previous_followers_set)
     logging.info("Previous number of followers: {}".format(previous_followers_number))
-    messaging = Messaging(twitter_api, args)
-    messaging.announce_follow_event(True, new_followers)
-    messaging.announce_follow_event(False, traitors)
 
-# Save the followers set in DB if there is change
-if len(new_followers) == 0 and len(traitors) == 0:
-    logging.info("\"[...] nihil novi sub sole.\" - Ecclesiastes 1:9")
-else:
-    database.update_followers_table(new_followers, traitors)
+    # Comparison of the two sets of followers
+    new_followers_set = current_followers_set - previous_followers_set
+    traitors_set = previous_followers_set - current_followers_set
+
+    # Publishing the results
+    if len(new_followers_set) == 0 and len(traitors_set) == 0:
+        logging.info("\"[...] nihil novi sub sole.\" - Ecclesiastes 1:9")
+    else:
+        database.update_followers_list(new_followers_set, traitors_set)
+        messaging = Messaging(args, twitter_api, database)
+        # New followers
+        if len(new_followers_set) > twitter_api.POST_DIRECT_MESSAGE_RATE_LIMIT:
+            messaging.present_new_followers(new_followers_set)
+        else:
+            messaging.publish_message("Congratulations! More than 10 persons started following you recently.")
+        # Traitors
+        if len(traitors_set) > twitter_api.POST_DIRECT_MESSAGE_RATE_LIMIT:
+            messaging.denounce_traitors(traitors_set)
+        else:
+            messaging.publish_message("Oops! More than 10 people unfollowed you recently.")
+
+
+# Save followers screen names in DB-------------------------------------------------------------------------------------
+unknown_followers = database.get_unknown_followers()
+unknown_followers_count = len(unknown_followers)
+logging.info("{} followers usernames are unknown.".format(unknown_followers_count))
+
+# Only one "GET friendships/lookup" per run
+if unknown_followers_count > twitter_api.MAX_AMOUNT_FRIENDSHIPS_LOOKUP:
+    unknown_followers = unknown_followers[:twitter_api.MAX_AMOUNT_FRIENDSHIPS_LOOKUP]
+
+followers_info = twitter_api.get_friendship_lookup(unknown_followers)
+database.update_followers_info(followers_info)
+logging.info("{} usernames have been saved in the DB.".format(len(followers_info)))
+
 
 # Delete old tweets and favorites---------------------------------------------------------------------------------------
 
