@@ -43,7 +43,7 @@ class ApiTest(TestCase):
 
     @pytest.mark.api_call
     def test_get_friendship_lookup(self):
-        friendships = self.twitter_api.get_friendship_lookup(shared_test_data.TWITTER_USER_ID)
+        friendships = self.twitter_api.get_friendship_lookup([shared_test_data.TWITTER_USER_ID])
         self.assertIsInstance(friendships, list)
         friendship = friendships[0]
         self.assertIsInstance(friendship, UserStatus)
