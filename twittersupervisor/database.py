@@ -47,21 +47,21 @@ class Database:
 
     def update_followers_info(self, followers_info):
         connection, cursor = self.open_connection()
-        cursor.executemany("UPDATE followers SET username = ? WHERE id =?", self.follower_generator(followers_info))
+        cursor.executemany("UPDATE followers SET username = ? WHERE id = ?", self.follower_generator(followers_info))
         connection.commit()
         connection.close()
 
     def get_username_by_id(self, user_id):
         connection, cursor = self.open_connection()
-        cursor.execute("SELECT username FROM followers WHERE id = ?", user_id)
-        username = cursor.fetchone()
+        cursor.execute("SELECT username FROM followers WHERE id = ?", (user_id,))
+        result = cursor.fetchone()
         connection.close()
-        return username
+        return result[0]
 
     def get_unknown_followers(self):
         connection, cursor = self.open_connection()
         cursor.execute("SELECT id FROM followers WHERE username is NULL")
-        result_tuples= cursor.fetchall()
+        result_tuples = cursor.fetchall()
         connection.close()
         unknown_followers = list()
         for result_tuple in result_tuples:

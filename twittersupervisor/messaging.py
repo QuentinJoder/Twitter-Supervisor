@@ -61,7 +61,7 @@ class Messaging:
     def _get_username(self, user_id):
         name = self.database.get_username_by_id(user_id)
         if name is None:
-            name = 'n°' + user_id
+            name = 'n°{}'.format(user_id)
         else:
-            name = '@' + name
+            name = '@{}'.format(name)
         return name
