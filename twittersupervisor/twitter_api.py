@@ -8,6 +8,12 @@ class TwitterApi:
     DESTROY_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/destroy/:id.json"
     DESTROY_FAVORITE_ENDPOINT = "https://api.twitter.com/1.1/favorites/destroy.json"
 
+    # Rate limit per 15 minutes window # TODO use a queue
+    POST_DIRECT_MESSAGE_RATE_LIMIT = 10
+
+    # Maximum amount of friendships we can look at with "GET friendships/lookup"
+    MAX_AMOUNT_FRIENDSHIPS_LOOKUP = 100
+
     def __init__(self, twitter_credentials):
         try:
             self.username = twitter_credentials["username"]
