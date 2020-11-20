@@ -5,6 +5,7 @@ config\.json
 drafts/
 virtualenv/
 venv/
+junit/
 
 # IDE
 \.idea/
