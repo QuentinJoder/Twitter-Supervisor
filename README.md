@@ -7,7 +7,7 @@ tweets and favorites but with some limitations (for details read the [related pa
 Additional features might be added in the (near) future: keeping track of the "betrayals", trends detection 
 in your friends (people you are following) tweets...
 
-[![Build Status](https://travis-ci.com/QuentinJoder/Twitter-Supervisor.svg?branch=master)](https://travis-ci.com/QuentinJoder/Twitter-Supervisor)
+![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
 ## Requirements
 * **Python 3.4 or more** (older versions are not tested) and **pip**
