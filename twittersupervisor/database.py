@@ -56,7 +56,10 @@ class Database:
         cursor.execute("SELECT username FROM followers WHERE id = ?", (user_id,))
         result = cursor.fetchone()
         connection.close()
-        return result[0]
+        if result is None:
+            return None
+        else:
+            return result[0]
 
     def get_unknown_followers(self):
         connection, cursor = self.open_connection()
