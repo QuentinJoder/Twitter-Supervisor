@@ -3,18 +3,18 @@ import argparse
 import logging
 import os.path
 # Custom dependencies
-from twittersupervisor import ConfigFileParser, Database, Messaging, TwitterApi
-import logging_config
+from twittersupervisor import LoggingConfig, ConfigFileParser, Database, Messaging, TwitterApi
 
 # Default values
 config_file_name = "config.json"
-logging_config.set_logging_config("twitter_supervisor.log")
 
-# Command line parsing & log config
+# Command line parsing
 parser = argparse.ArgumentParser(prog="twitter-supervisor")
 parser.add_argument("--quiet", help="disable the sending of direct messages", action="store_true")
 parser.add_argument("--config", help="specify which configuration file to use. It must be a JSON file.", nargs=1,
                     metavar="CONFIG_FILE")
+parser.add_argument("--loglevel", help="set what minimum log level to use (default is INFO)",
+                    choices=LoggingConfig.LOG_LEVELS)
 parser.add_argument("--database", help="specify which SQLite .db file to use", nargs=1, metavar="DB_FILE")
 parser.add_argument("--delete_tweets",
                     help="delete old tweets of the account, preserve only the specified number (by default 50)",
@@ -26,13 +26,19 @@ parser.add_argument("--delete_retweets",
 parser.add_argument("--delete_favorites",
                     help="delete old likes of the account, preserve only the specified number (by default 10)",
                     nargs='?', metavar="NUM_OF_PRESERVED_FAVORITES", type=int, const=10)
-parser.add_argument("--version", action="version", version='%(prog)s v0.4.0')
+parser.add_argument("--version", action="version", version='%(prog)s v0.5.0')
 args = parser.parse_args()
-logging.debug('Parser arguments: {0}'.format(args))
 
+# Setup configuration--------------------------------------------------------------------------------------------------
+# Logging
+log_level = "INFO"
+if args.loglevel:
+    log_level = args.loglevel
+LoggingConfig.set_logging_config("twitter_supervisor.log", log_level)
+
+logging.debug('Parser arguments: {0}'.format(args))
 logging.info('TWITTER SUPERVISOR STARTS!')
 
-# Setup configuration---------------------------------------------------------------------------------------------------
 # Config file
 if args.config:
     if os.path.isfile(args.config[0]):
@@ -63,7 +69,7 @@ else:
 
 logging.debug("Configuration loaded from: {}".format(config.config_file_name))
 logging.debug("Data saved in: {}".format(database.database_name))
-logging.debug("Username: {}".format(twitter_api.username))
+logging.info("Username: {}".format(twitter_api.username))
 
 # Main function---------------------------------------------------------------------------------------------------------
 
@@ -91,7 +97,7 @@ else:
 
     # Publishing the results
     if len(new_followers_set) == 0 and len(traitors_set) == 0:
-        logging.info("\"[...] nihil novi sub sole.\" - Ecclesiastes 1:9")
+        logging.info("No change in the followers list.")
     else:
         database.update_followers_list(new_followers_set, traitors_set)
         messaging = Messaging(args, twitter_api, database)
@@ -108,20 +114,20 @@ else:
         elif traitors_number > twitter_api.POST_DIRECT_MESSAGE_RATE_LIMIT:
             messaging.publish_message("Oops! More than 10 people unfollowed you recently.")
 
-
 # Save followers screen names in DB-------------------------------------------------------------------------------------
 unknown_followers = database.get_unknown_followers()
 unknown_followers_count = len(unknown_followers)
-logging.info("{} followers usernames are unknown.".format(unknown_followers_count))
 
 if unknown_followers_count > 0:
+    logging.info("{} followers usernames are unknown.".format(unknown_followers_count))
     # Only one "GET friendships/lookup" per run
     if unknown_followers_count > twitter_api.MAX_AMOUNT_FRIENDSHIPS_LOOKUP:
         unknown_followers = unknown_followers[:twitter_api.MAX_AMOUNT_FRIENDSHIPS_LOOKUP]
     followers_info = twitter_api.get_friendship_lookup(unknown_followers)
     database.update_followers_info(followers_info)
     logging.info("{} usernames have been saved in the DB.".format(len(followers_info)))
-
+else:
+    logging.debug("No unknown follower's username in the DB")
 
 # Delete old tweets and favorites---------------------------------------------------------------------------------------
 

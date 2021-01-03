@@ -2,18 +2,16 @@
 > "I made this program to learn about Python and to know who stop following me on Twitter." - Quentin JODER 
 
 Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. It can also destroy your old
-tweets and favorites but with some limitations (for details read the [related paragraph](#Limitations of the Twitter API)).
-
-Additional features might be added in the (near) future: keeping track of the "betrayals", trends detection 
-in your friends (people you are following) tweets...
+tweets, retweets and favorites but with some limitations (for details read the [related paragraph](#Limitations of the Twitter API)).
 
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
 ## Requirements
 * **Python 3.4 or more** (older versions are not tested) and **pip**
-* **Having a (at least free) Twitter developer account** (https://developer.twitter.com/en/apply-for-access), to get the
- key, the token and their secrets, which are all required to access the Twitter API.
-* Don't forget to give **'Direct Message' permission** for your API.
+* **A Twitter developer account** (a free one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
+* **Create an app in the [developer portal](https://developer.twitter.com/en/portal/projects-and-apps)** to get the
+credentials required to access the Twitter API.
+* Don't forget to give **'Direct Message' permission** to the app there.
 
 ## Installation
 * Clone the project repository on your machine.
@@ -40,10 +38,11 @@ in the project directory, run:
 ```bash
 $ pytest
 ``` 
-and if you want to test if the methods calling the Twitter API works too:
+and if you want to test if the methods calling the Twitter API work too:
 ```bash
 $ pytest --allow_api_call
 ```
+
 ## How to use it?
 ### Core command line
 Run `$ python main.py`(Windows) or `$ python3 main.py`(Linux):
@@ -59,6 +58,8 @@ optional arguments:
   --quiet               disable the sending of direct messages
   --config CONFIG_FILE  specify which configuration file to use. It must be a
                         JSON file.
+  --loglevel {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                        set what minimum log level to use (default is INFO)
   --database DB_FILE    specify which SQLite .db file to use
   --delete_tweets [NUM_OF_PRESERVED_TWEETS]
                         delete old tweets of the account, preserve only the
@@ -75,11 +76,11 @@ optional arguments:
 ```
 
 
-## Automate the script with cron
-If you wish to automate this operation, you can, for example, create a scheduled job on a Linux server with **cron**:
+## Run the program automatically
+To do that, you can, for example, create a scheduled job on a Linux server with **cron**:
 * edit the crontab file of a user with the command `crontab -e`
-* if you want to check for new followers/unfollowers each day at 7:00 a.m, insert:
-<br/>`0 7 * * * cd [path to the parent directory of "Twitter-Supervisor"]/Twitter-Supervisor && python3 main.py`
+* if you want to check for new followers/unfollowers each day at 7:00 a.m, and keep your 10 most recent tweets, add:
+<br/>`0 7 * * * cd /path/to/Twitter-Supervisor && python3 main.py --delete_tweets=10`
 <br/>(`0 7 * * *` is the schedule time, https://crontab.guru/ can help you to define it. The rest of the entry is the 
 command cron will run)
 * save and close the editor with `Ctrl+X`and then `Y`(nano) or `:wq`(vim), and it is done !
@@ -87,13 +88,12 @@ command cron will run)
 For more information about cron, the syntax of the crontab files, nano or vim... ask your favorite search engine !
 
 ## Limitations of the Twitter API
-The Twitter API has limitations which are particularly restraining the ability to delete your statuses and favorites in 
-mass. With a standard developer account you :
+The Twitter API has limitations which can restrain your ability to delete your statuses and favorites in 
+mass with this tool. With a standard developer account you can:
 
-- can only access the latest 3200 tweets of a user. Therefore, you cannot delete older tweets (except if you delete recent
-tweets to let older ones takes their places!)
-- can theoretically delete no more than 15 statuses and 15 favorites per 15 minutes window.
+- only get (and therefore delete) the 3200 last tweets of your own timeline.
+- theoretically delete no more than 15 statuses and 15 favorites per 15 minutes window.
 
 Consequently, the `--delete_tweets`, `--delete_retweets` or `--delete-favorites` [options](#options) are not useful if you want to mass
- delete your likes and tweets at once. Their intended purpose is enable you automatically delete your oldest tweets and 
- likes, in the long term, with an [automated](#automate-the-script-with-cron) use of the script.
+ delete your likes and tweets at once. Their intended purpose is enable you to regularly delete your oldest tweets and 
+ likes, in the long term, with a [periodic](#run-the-program-automatically) run of the program.
