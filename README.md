@@ -8,7 +8,7 @@ tweets, retweets and favorites but with some limitations (for details read the [
 
 ## Requirements
 * **Python 3.4 or more** (older versions are not tested) and **pip**
-* **A Twitter developer account** (a free one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
+* **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
 * **Create an app in the [developer portal](https://developer.twitter.com/en/portal/projects-and-apps)** to get the
 credentials required to access the Twitter API.
 * Don't forget to give **'Direct Message' permission** to the app there.
@@ -79,7 +79,7 @@ optional arguments:
 ## Run the program automatically
 To do that, you can, for example, create a scheduled job on a Linux server with **cron**:
 * edit the crontab file of a user with the command `crontab -e`
-* if you want to check for new followers/unfollowers each day at 7:00 a.m, and keep your 10 most recent tweets, add:
+* if you want to check for new followers/unfollowers each day at 7:00 a.m, and keep only your 10 most recent tweets, add:
 <br/>`0 7 * * * cd /path/to/Twitter-Supervisor && python3 main.py --delete_tweets=10`
 <br/>(`0 7 * * *` is the schedule time, https://crontab.guru/ can help you to define it. The rest of the entry is the 
 command cron will run)
@@ -96,4 +96,4 @@ mass with this tool. With a standard developer account you can:
 
 Consequently, the `--delete_tweets`, `--delete_retweets` or `--delete-favorites` [options](#options) are not useful if you want to mass
  delete your likes and tweets at once. Their intended purpose is enable you to regularly delete your oldest tweets and 
- likes, in the long term, with a [periodic](#run-the-program-automatically) run of the program.
+ likes, over the long term, with a [periodic program execution](#run-the-program-automatically).
