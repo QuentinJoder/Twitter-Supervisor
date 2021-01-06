@@ -10,14 +10,21 @@ class Database:
     def create_tables(self):
         connection, cursor = self.open_connection()
         cursor.execute("CREATE TABLE `followers` (`id` integer NOT NULL UNIQUE,`username` TEXT, PRIMARY KEY(`id`))")
-        cursor.execute("CREATE TABLE IF NOT EXISTS friendship_events"
-                       "(user_id integer, event_date text, follows integer)")
+        cursor.execute("CREATE TABLE friendship_events (user_id integer, event_date text, follows integer)")
+        cursor.execute("CREATE TABLE `users` (`username` TEXT NOT NULL, `access_token` TEXT NOT NULL,"
+                       "`access_token_secret` TEXT NOT NULL, PRIMARY KEY(`username`))")
         connection.commit()
         connection.close()
 
     def open_connection(self):
         connection = sqlite3.connect(self.database_name)
         return connection, connection.cursor()
+
+    def create_user(self, username, access_token, access_token_secret):
+        connection, cursor = self.open_connection()
+        cursor.execute("INSERT into users VALUES(?,?,?)", (username, access_token, access_token_secret,))
+        connection.commit()
+        connection.close()
 
     def get_previous_followers_set(self):
         connection, cursor = self.open_connection()
@@ -88,4 +95,3 @@ class Database:
     def follower_generator(followers):
         for follower in followers:
             yield follower.screen_name, follower.id,
-
