@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+{% block containercontent %}
+<h2>Error</h2>
+<div class="panel panel-danger">
+    		<div class="panel-heading">
+    			<h3 class="panel-title">Sorry, an error occurred:</h3>
+    		</div>
+    		<div class="panel-body">{{ error_message }}</div>
+    	</div>
+{% endblock %}

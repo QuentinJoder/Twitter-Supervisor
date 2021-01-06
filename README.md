@@ -1,7 +1,7 @@
 # Twitter Supervisor
 > "I made this program to learn about Python and to know who stop following me on Twitter." - Quentin JODER 
 
-Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. It can also destroy your old
+Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. It can also delete your old
 tweets, retweets and favorites but with some limitations (for details read the [related paragraph](#Limitations of the Twitter API)).
 
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)

@@ -1,10 +1,20 @@
-__pycache__
+# Project
 config\.json
+config.cfg
 *.db
 *.log
 drafts/
+
+# Python
 virtualenv/
 venv/
+__pycache__
+*.pyc
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
 junit/
 
 # IDE
