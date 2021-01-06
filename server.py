@@ -1,12 +1,19 @@
+import logging
+
 from flask import Flask, render_template, url_for
 from tweepy import OAuthHandler, TweepError
-import logging
+
 from twittersupervisor import LoggingConfig
 
-
 app = Flask(__name__)
-app.config.from_pyfile('config.cfg', silent=False)
-LoggingConfig.set_logging_config("twitter_supervisor.log", "DEBUG")
+app.config.from_pyfile('config.cfg', silent=True)
+
+# Logging
+try:
+    log_level = app.config['LOG_LEVEL']
+except KeyError:
+    log_level = 'INFO'
+LoggingConfig.set_logging_config('twitter_supervisor.log', log_level)
 
 
 @app.route('/')
