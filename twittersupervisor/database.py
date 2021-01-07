@@ -1,11 +1,12 @@
 import sqlite3
 from datetime import datetime
+from flask import current_app
 
-
+# TODO Use SQLAlchemy (or any proper ORM)
 class Database:
 
-    def __init__(self, database_name):
-        self.database_name = database_name
+    def __init__(self):
+        self.database_name = current_app.config["DATABASE_FILE"]
 
     def create_tables(self):
         connection, cursor = self.open_connection()
