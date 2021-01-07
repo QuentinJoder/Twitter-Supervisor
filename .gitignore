@@ -1,6 +1,5 @@
 # Project
-config\.json
-config.cfg
+instance/
 *.db
 *.log
 drafts/
