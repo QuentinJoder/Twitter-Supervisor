@@ -22,9 +22,27 @@ class Database:
 
     def create_user(self, username, access_token, access_token_secret):
         connection, cursor = self.open_connection()
-        cursor.execute("INSERT into users VALUES(?,?,?)", (username, access_token, access_token_secret,))
+        cursor.execute("REPLACE INTO users VALUES(?,?,?)", (username, access_token, access_token_secret,))
         connection.commit()
         connection.close()
+
+    def get_user_token_and_secret(self, username):
+        connection, cursor = self.open_connection()
+        cursor.execute("SELECT access_token, access_token_secret FROM users WHERE username = ?", (username,))
+        result = cursor.fetchone()
+        connection.close()
+        # TODO Create a DBException to raise here
+        if result is None:
+            return None
+        else:
+            return result
+
+    def get_followers(self):
+        connection, cursor = self.open_connection()
+        cursor.execute("SELECT * FROM followers")
+        result = cursor.fetchall()
+        connection.close()
+        return result
 
     def get_previous_followers_set(self):
         connection, cursor = self.open_connection()

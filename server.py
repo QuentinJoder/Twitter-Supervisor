@@ -1,7 +1,7 @@
 import logging
 
 from flask import Flask, render_template, url_for, request, redirect, session
-from tweepy import OAuthHandler, TweepError
+from tweepy import OAuthHandler, TweepError, API
 
 from twittersupervisor import LoggingConfig, Database
 
@@ -75,7 +75,9 @@ def callback():
 def followers():
     if 'username' in session:
         username = session['username']
-        return render_template('followers.html', username=username)
+        followers_list = db.get_followers()
+        logging.debug(followers_list)
+        return render_template('followers.html', username=username, followers=followers_list)
     else:
         render_template('error.html', error_message="You need to be logged in to access this page.")
 

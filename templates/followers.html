@@ -1,5 +1,22 @@
 {% extends "index.html" %}
 {% block containercontent %}
 <h2>Followers</h2>
-<p> Hello {{username}}, soon you will see below your followers !</p>
+<table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Screen Name</th>
+          <!--th scope="col">Display Name</th-->
+        </tr>
+      </thead>
+      <tbody>
+        {% for follower in followers %}
+        <tr>
+          <th scope="row">{{ follower[0] }}</th>
+          <th scope="row">{{ follower[1] }}</th>
+          <!--th scope="row">{{ follower.display_name }}</th-->
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}
