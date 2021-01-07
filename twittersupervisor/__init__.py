@@ -7,7 +7,7 @@ from .database import Database
 from .messaging import Messaging
 from .twitter_api import TwitterApi
 from .logging_config import LoggingConfig
-from .auth import bp
+from .auth import bp as auth_bp
 
 
 def create_app():
@@ -23,7 +23,7 @@ def create_app():
     LoggingConfig.set_logging_config('twitter_supervisor.log', log_level)
 
     # Blueprints and routes
-    app.register_blueprint(auth.bp)
+    app.register_blueprint(auth_bp)
 
     @app.route('/')
     @app.route('/welcome')
