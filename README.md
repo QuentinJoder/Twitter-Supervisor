@@ -1,91 +1,95 @@
-# Twitter Supervisor
+# Twitter-Supervisor
 > "I made this program to learn about Python and to know who stop following me on Twitter." - Quentin JODER 
 
-Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. It can also delete your old
-tweets, retweets and favorites but with some limitations (for details read the [related paragraph](#Limitations of the Twitter API)).
+Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. You can set it up to delete
+your old tweets, retweets and favorites.
+
+Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [tweepy](https://www.tweepy.org/) and 
+[python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API.
 
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
 ## Requirements
 * **Python 3.4 or more** (older versions are not tested) and **pip**
+
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
-* **Create an app in the [developer portal](https://developer.twitter.com/en/portal/projects-and-apps)** to get the
-credentials required to access the Twitter API.
-* Don't forget to give **'Direct Message' permission** to the app there.
 
-## Installation
-* Clone the project repository on your machine.
-* Run `pip install -Ur requirements.txt`
-* Create a `config.json` file (if you choose another name, specify it with the [option](#options)`--config` when you run
- the script) in the project directory, where you will put the API keys, the id of the account you want to supervise, and
-  the name of the SQLite database file where the app data will be stored. It should look like this:
+## How to run the app
 
-    ```json
-    {
-      "twitter_api": {
-        "username": "@aTwitterUserName",
-        "consumer_key": "...",
-        "consumer_secret": "...",
-        "access_token": "...",
-        "access_token_secret": "..."
-      },
-      "database_file": "followers.db"
-    }
-    ```
+### Twitter Developer Portal
+* Create a **Standalone app** in the [developer portal](https://developer.twitter.com/en/portal/projects-and-apps)
+(the app uses Standard v1.1 endpoints )
 
-## Tests
-in the project directory, run: 
-```bash
+* Save the app **consumer key** and **consumer secret** and get an **access token** and **access token secret** for yourself.
+
+* Activate the **Enable 3-legged OAuth** option. ("Request email address from users" is useless)
+
+* Set `http://127.0.0.1:5000/auth/callback` and `http://localhost/auth/callback` as **callback URLs** to be able to run and test the app locally.
+
+* Give it the **'Read + Write + Direct Messages'** permissions. 
+
+### Installation
+* Clone the project repository on your machine: `git clone https://github.com/QuentinJoder/Twitter-Supervisor.git`
+
+* Open a terminal in the project folder and create a [virtual environment](https://flask.palletsprojects.com/en/1.1.x/installation/#virtual-environments).
+
+* Run `$ pip install -Ur requirements.txt` in the virtual environment to install dependencies.
+
+* There are two ways to give to the app the Twitter API credentials you created and other config parameters:
+    1) Create a `config.cfg` file in the `/instance` folder where you put the config keys. There is already a skeleton 
+    called `config.cfg.sample` in the aforementioned folder that you can fill and rename.
+
+        ```properties
+        ## MANDATORY
+        # Required by flask.session, run `$ python -c 'import os; print(os.urandom(16))'` to get one
+        SECRET_KEY= b'...'
+        
+        # TWITTER API
+        APP_CONSUMER_KEY='aConsumerKey'
+        APP_CONSUMER_SECRET='aConsumerSecret'
+        
+        # DATABASE (Twitter Supervisor uses an SQLite database)
+        DATABASE_FILE='instance/twittersupervisor.db'
+        
+        ## OPTIONAL
+        # TWITTER CREDENTIALS (Needed if you want to run tests)
+        DEFAULT_ACCESS_TOKEN='aUserAccessToken'
+        DEFAULT_ACCESS_TOKEN_SECRET='aUserAccessTokenSecret'
+        DEFAULT_USER='aUser'
+        
+        # LOGGING
+        LOG_LEVEL='WARNING'
+        LOG_FILE='twitter_supervisor.log'
+        ```
+  
+    2) Or define all the parameters above as environment variables with `export` in Linux (`SET` in Windows) before you run
+     or test the app:
+        ```shell script
+        $ export DEFAULT_USER=JohnSmith
+        $ export DEFAULT_ACCESS_TOKEN=pEeIsStOrEdInThEbAlLs
+        $ ...
+        ```
+* You can now run [tests](#Tests) to check if everything works and run the app !
+
+### Run the app
+Like any Flask application, launch Twitter-Supervisor with:
+```shell script
+$ export FLASK_APP=twittersupervisor
+$ flask run
+```
+There is a `flask_run.sh` script in the project files which does that.
+
+`$ ./flask_run.sh development`  launch the live server in [Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode).
+
+### Tests
+in the project directory, simply run: 
+```shell script
 $ pytest
 ``` 
 and if you want to test if the methods calling the Twitter API work too:
-```bash
+```shell script
 $ pytest --allow_api_call
 ```
-
-## How to use it?
-### Core command line
-Run `$ python main.py`(Windows) or `$ python3 main.py`(Linux):
-* the first time it will only create a `followers.db` SQLite database (to store the app data) and a `.log` file.
-* Then, each time this command is run, the specified account (`"username"` key in `config.json`) will receive messages
-telling him who are the followers it has gained or lost in the meantime.
-
-
-### Options
-```
-optional arguments:
-  -h, --help            show this help message and exit
-  --quiet               disable the sending of direct messages
-  --config CONFIG_FILE  specify which configuration file to use. It must be a
-                        JSON file.
-  --loglevel {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                        set what minimum log level to use (default is INFO)
-  --database DB_FILE    specify which SQLite .db file to use
-  --delete_tweets [NUM_OF_PRESERVED_TWEETS]
-                        delete old tweets of the account, preserve only the
-                        specified number (by default 50)
-  --delete_retweets [NUM_OF_PRESERVED_RETWEETS]
-                        delete old "blank" retweets (does not delete quoted
-                        statuses), preserve only the specified number (by
-                        default 10)
-  --delete_favorites [NUM_OF_PRESERVED_FAVORITES]
-                        delete old likes of the account, preserve only the
-                        specified number (by default 10)
-  --version             show the program version number and exit
-
-```
-
-
-## Run the program automatically
-To do that, you can, for example, create a scheduled job on a Linux server with **cron**:
-* edit the crontab file of a user with the command `crontab -e`
-* if you want to check for new followers/unfollowers each day at 7:00 a.m, and keep only your 10 most recent tweets, add:
-<br/>`0 7 * * * cd /path/to/Twitter-Supervisor && python3 main.py --delete_tweets=10`
-<br/>(`0 7 * * *` is the schedule time, https://crontab.guru/ can help you to define it. The rest of the entry is the 
-command cron will run)
-* save and close the editor with `Ctrl+X`and then `Y`(nano) or `:wq`(vim), and it is done !
-
-For more information about cron, the syntax of the crontab files, nano or vim... ask your favorite search engine !
 
 ## Limitations of the Twitter API
 The Twitter API has limitations which can restrain your ability to delete your statuses and favorites in 
@@ -93,7 +97,3 @@ mass with this tool. With a standard developer account you can:
 
 - only get (and therefore delete) the 3200 last tweets of your own timeline.
 - theoretically delete no more than 15 statuses and 15 favorites per 15 minutes window.
-
-Consequently, the `--delete_tweets`, `--delete_retweets` or `--delete-favorites` [options](#options) are not useful if you want to mass
- delete your likes and tweets at once. Their intended purpose is enable you to regularly delete your oldest tweets and 
- likes, over the long term, with a [periodic program execution](#run-the-program-automatically).

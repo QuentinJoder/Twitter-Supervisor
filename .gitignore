@@ -1,5 +1,6 @@
 # Project
 instance/
+!instance/config.cfg.sample
 *.db
 *.log
 drafts/

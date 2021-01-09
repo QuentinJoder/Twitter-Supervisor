@@ -1,0 +1,20 @@
+## MANDATORY
+# Required by flask.session, run `$ python -c 'import os; print(os.urandom(16))'` to get one
+SECRET_KEY= b'...'
+
+# TWITTER API
+APP_CONSUMER_KEY='aConsumerKey'
+APP_CONSUMER_SECRET='aConsumerSecret'
+
+# DATABASE (Twitter Supervisor uses an SQLite database)
+DATABASE_FILE='instance/twittersupervisor.db'
+
+## OPTIONAL
+# TWITTER CREDENTIALS (Needed if you want to run tests)
+DEFAULT_ACCESS_TOKEN='aUserAccessToken'
+DEFAULT_ACCESS_TOKEN_SECRET='aUserAccessTokenSecret'
+DEFAULT_USER='aUser'
+
+# LOGGING
+LOG_LEVEL='WARNING'
+LOG_FILE='twitter_supervisor.log'
