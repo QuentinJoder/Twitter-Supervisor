@@ -37,8 +37,8 @@ jobs:
       env:
           DEFAULT_ACCESS_TOKEN: ${{ secrets.DEFAULT_ACCESS_TOKEN }}
           DEFAULT_ACCESS_TOKEN_SECRET: ${{ secrets.DEFAULT_ACCESS_TOKEN_SECRET }}
-          CONSUMER_KEY: ${{ secrets.APP_CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.APP_CONSUMER_SECRET }}
+          APP_CONSUMER_KEY: ${{ secrets.APP_CONSUMER_KEY }}
+          APP_CONSUMER_SECRET: ${{ secrets.APP_CONSUMER_SECRET }}
           DEFAULT_USER: ${{ secrets.DEFAULT_USER }}  
       run: |
         pytest tests/ --allow_api_call --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml
