@@ -38,7 +38,12 @@ class Config:
                 logging.warning("No 'LOG_LEVEL' was found in {0}. Default value is used: LOG_LEVEL={1}"
                                 .format(config_source, cls.DEFAULT_LOG_LEVEL))
         else:
-            cls.set_logging_config(config['LOG_FILE'], config['LOG_LEVEL'])
+            if 'LOG_FILE' not in config:
+                cls.set_logging_config(cls.DEFAULT_LOG_FILE, config['LOG_LEVEL'])
+                logging.warning("No 'LOG_FILE' was found in {0}. Default value is used: LOG_FILE={1}"
+                                .format(config_source, cls.DEFAULT_LOG_FILE))
+            else:
+                cls.set_logging_config(config['LOG_FILE'], config['LOG_LEVEL'])
 
         # Check if all the mandatory config keys are set
         if 'SECRET_KEY' not in config:
