@@ -35,6 +35,7 @@ jobs:
 
     - name: Test with pytest
       env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEFAULT_ACCESS_TOKEN: ${{ secrets.DEFAULT_ACCESS_TOKEN }}
           DEFAULT_ACCESS_TOKEN_SECRET: ${{ secrets.DEFAULT_ACCESS_TOKEN_SECRET }}
           CONSUMER_KEY: ${{ secrets.APP_CONSUMER_KEY }}

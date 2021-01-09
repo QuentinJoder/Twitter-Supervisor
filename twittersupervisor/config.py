@@ -73,6 +73,7 @@ class Config:
     def get_config_from_env(cls):
         config = dict()
         try:
+            config['SECRET_KEY'] = environ['SECRET_KEY']
             config['DEFAULT_ACCESS_TOKEN'] = environ['DEFAULT_ACCESS_TOKEN']
             config['DEFAULT_ACCESS_TOKEN_SECRET'] = environ['DEFAULT_ACCESS_TOKEN_SECRET']
             config['APP_CONSUMER_KEY'] = environ['APP_CONSUMER_KEY']
