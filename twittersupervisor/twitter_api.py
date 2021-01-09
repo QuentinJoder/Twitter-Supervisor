@@ -1,3 +1,4 @@
+from flask import current_app
 from twitter import Api, error
 import tweepy
 import logging
@@ -14,24 +15,20 @@ class TwitterApi:
     # Maximum amount of friendships we can look at with "GET friendships/lookup"
     MAX_AMOUNT_FRIENDSHIPS_LOOKUP = 100
 
-    def __init__(self, twitter_credentials):
-        try:
-            self.username = twitter_credentials["username"]
-            # python-twitter
-            self.api = Api(consumer_key=twitter_credentials["consumer_key"],
-                           consumer_secret=twitter_credentials["consumer_secret"],
-                           access_token_key=twitter_credentials["access_token"],
-                           access_token_secret=twitter_credentials["access_token_secret"])
-            # tweepy
-            auth = tweepy.OAuthHandler(twitter_credentials["consumer_key"], twitter_credentials["consumer_secret"])
-            auth.set_access_token(twitter_credentials["access_token"], twitter_credentials["access_token_secret"])
-            self.tweepy_api = tweepy.API(auth)
-        except KeyError as key_error:
-            logging.critical("Invalid \"twitter_credentials\" argument: {}".format(key_error.args[0]))
-            raise
-        except TypeError as type_error:
-            logging.critical("Incorrect \"twitter_credentials\" argument: {}".format(type_error.args[0]))
-            raise
+    def __init__(self, access_token, access_token_secret, consumer_key=None, consumer_secret=None, username=None):
+        self.username = username
+        if (consumer_key or consumer_secret) is None:
+            consumer_key = current_app.config['APP_CONSUMER_KEY']
+            consumer_secret = current_app.config['APP_CONSUMER_SECRET']
+        # python-twitter
+        self.api = Api(consumer_key=consumer_key,
+                       consumer_secret=consumer_secret,
+                       access_token_key=access_token,
+                       access_token_secret=access_token_secret)
+        # tweepy
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        self.tweepy_api = tweepy.API(auth)
 
     def check_rate_limit(self, endpoint_url):
         try:

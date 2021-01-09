@@ -1,26 +1,34 @@
-from flask import Flask, render_template, url_for, request, redirect, session
-from tweepy import OAuthHandler, TweepError
+from flask import Flask, render_template, session
+from os import path
 import logging
 
-from .config_file_parser import ConfigFileParser
 from .database import Database
 from .messaging import Messaging
 from .twitter_api import TwitterApi
-from .logging_config import LoggingConfig
+from .config import Config, ConfigException
 from .auth import bp as auth_bp
 
+CONFIG_FILE = 'config.cfg'
 
-def create_app():
+
+def create_app(test_config=None):
+
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_pyfile('config.cfg', silent=True)
-
-    # Logging
+    config_filepath = path.join(app.instance_path, CONFIG_FILE)
     try:
-        log_level = app.config['LOG_LEVEL']
-    except KeyError:
-        log_level = 'INFO'
-    LoggingConfig.set_logging_config('twitter_supervisor.log', log_level)
+        if path.isfile(config_filepath):
+            app.config.from_pyfile(CONFIG_FILE, silent=True)
+            config_source = config_filepath
+        else:
+            app.config.from_mapping(Config.get_config_from_env(), silent=True)
+            config_source = "ENV variables"
+        if test_config is not None:
+            app.config.from_mapping(test_config)
+        Config.check_config(app.config, config_source)
+    except ConfigException as ce:
+        logging.critical(ce.message)
+        # TODO find a way to kill the server after that
 
     # Blueprints and routes
     app.register_blueprint(auth_bp)

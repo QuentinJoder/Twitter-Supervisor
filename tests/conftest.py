@@ -1,4 +1,7 @@
 import pytest
+import os
+import tempfile
+from twittersupervisor import create_app, Database
 
 
 def pytest_addoption(parser):
@@ -14,3 +17,30 @@ def pytest_collection_modifyitems(config, items):
         if "api_call" in item.keywords:
             item.add_marker(skip_api_call)
 
+
+# Fixtures
+@pytest.fixture
+def app():
+    db_fd, db_path = tempfile.mkstemp()
+
+    app = create_app({
+        'TESTING': True,
+        'LOG_LEVEL': 'DEBUG',
+        'DATABASE_FILE': db_path,
+    })
+
+    with app.app_context():
+        # init_db()
+        # get_db().executescript(_data_sql)
+        db = Database()
+        db.create_tables()
+
+    yield app
+
+    os.close(db_fd)
+    os.unlink(db_path)
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()

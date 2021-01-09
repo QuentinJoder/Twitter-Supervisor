@@ -51,6 +51,7 @@ def callback():
     try:
         (access_token, access_token_secret) = auth.get_access_token(oauth_verifier)
     except TweepError as error:
+        logging.error("Unable to set access token & secret: {0}".format(error))
         return render_template('error.html', error_message=error.reason)
     auth.set_access_token(access_token, access_token_secret)
     username = auth.get_username()
