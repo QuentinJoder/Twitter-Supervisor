@@ -1,5 +1,6 @@
 from flask import Flask, render_template, session
 from os import path
+from sys import exit
 import logging
 
 from .database import Database
@@ -25,10 +26,11 @@ def create_app(test_config=None):
             config_source = "ENV variables"
         if test_config is not None:
             app.config.from_mapping(test_config)
-        Config.check_config(app.config, config_source)
+            config_source += str("+ test_config")
+        app.config = Config.check_config(app.config, config_source)
     except ConfigException as ce:
         logging.critical(ce.message)
-        # TODO find a way to kill the server after that
+        exit(1)
 
     # Blueprints and routes
     app.register_blueprint(auth_bp)

@@ -6,6 +6,7 @@ import logging
 
 class TwitterApi:
 
+    MAX_USERNAME_LENGTH = 15
     DESTROY_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/destroy/:id.json"
     DESTROY_FAVORITE_ENDPOINT = "https://api.twitter.com/1.1/favorites/destroy.json"
 

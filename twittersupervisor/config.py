@@ -6,8 +6,11 @@ from twitter import error
 
 class Config:
     LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    DEFAULT_LOG_FILE = "twitter_supervisor.log"
-    DEFAULT_LOG_LEVEL = "INFO"
+    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET']
+    OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'DATABASE_FILE',
+                     'LOG_LEVEL', 'LOG_FILE']
+    DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO",
+                      'DATABASE_FILE': "instance/twitter_supervisor.db"}
 
     @staticmethod
     def set_logging_config(log_file_name, log_level):
@@ -24,63 +27,74 @@ class Config:
         logging.getLogger('').addHandler(console)
 
     @classmethod
+    def check_config_parameter(cls, key, value):
+        def log_level():
+            if value not in cls.LOG_LEVELS:
+                return cls.DEFAULT_VALUES[key]
+            return value
+
+        def default_user():
+            if len(value) > TwitterApi.MAX_USERNAME_LENGTH:
+                return None
+            return value
+        # TODO LOW-PRIORITY: check if db file and log file have a valid name
+        switcher = {'LOG_LEVEL': log_level, 'DEFAULT_USER': default_user}
+        if key in switcher:
+            return switcher[key]()
+        return value
+
+    @classmethod
     def check_config(cls, config, config_source):
 
-        # Logging
-        if 'LOG_LEVEL' not in config:
-            if 'LOG_FILE' not in config:
-                cls.set_logging_config(cls.DEFAULT_LOG_FILE, cls.DEFAULT_LOG_LEVEL)
-                logging.warning("No 'LOG_LEVEL' and 'LOG_FILE' were found in {0}. Default values are used: LOG_FILE={1}"
-                                ", LOG_LEVEL={2}".format(config_source, cls.DEFAULT_LOG_FILE, cls.DEFAULT_LOG_LEVEL))
+        # Optional config keys
+        for key in cls.OPTIONAL_KEYS:
+            if key not in config:
+                if key in cls.DEFAULT_VALUES:
+                    config[key] = cls.DEFAULT_VALUES[key]
             else:
-                # TODO check if log file is valid (good name, can be written)
-                cls.set_logging_config(config['LOG_FILE'], cls.DEFAULT_LOG_LEVEL)
-                logging.warning("No 'LOG_LEVEL' was found in {0}. Default value is used: LOG_LEVEL={1}"
-                                .format(config_source, cls.DEFAULT_LOG_LEVEL))
-        else:
-            if 'LOG_FILE' not in config:
-                cls.set_logging_config(cls.DEFAULT_LOG_FILE, config['LOG_LEVEL'])
-                logging.warning("No 'LOG_FILE' was found in {0}. Default value is used: LOG_FILE={1}"
-                                .format(config_source, cls.DEFAULT_LOG_FILE))
-            else:
-                cls.set_logging_config(config['LOG_FILE'], config['LOG_LEVEL'])
+                config[key] = cls.check_config_parameter(key, config[key])
 
-        # Check if all the mandatory config keys are set
-        if 'SECRET_KEY' not in config:
-            raise ConfigException("No 'SECRET_KEY' key found in app config. Check the config source: {}"
-                                  .format(config_source))
-        if 'APP_CONSUMER_KEY' not in config:
-            raise ConfigException("No 'APP_CONSUMER_KEY' key found in app config. Check the config source: {}"
-                                  .format(config_source))
-        if 'APP_CONSUMER_SECRET' not in config:
-            raise ConfigException("No 'APP_CONSUMER_SECRET' key found in app config. Check the config source: {}"
-                                  .format(config_source))
-        if 'DATABASE_FILE' not in config:
-            raise ConfigException("No 'DATABASE_FILE' key found in app config. Check the config source: {}"
-                                  .format(config_source))
+        cls.set_logging_config(config['LOG_FILE'], config['LOG_LEVEL'])
+
+        # Raise exception if a mandatory config key is missing
+        for key in cls.MANDATORY_KEYS:
+            if key not in config:
+                raise ConfigException("The mandatory config key '{0}' was not found in app config: {1}"
+                                      .format(key, config_source))
 
         # Check if Twitter API keys work
         if ('DEFAULT_ACCESS_TOKEN' in config) and ('DEFAULT_ACCESS_TOKEN_SECRET' in config):
             api = TwitterApi(config['DEFAULT_ACCESS_TOKEN'], config['DEFAULT_ACCESS_TOKEN_SECRET'],
                              config['APP_CONSUMER_KEY'], config['APP_CONSUMER_SECRET'])
-
             try:
                 api.verify_credentials()
-            except error as e:
+            except error.TwitterError as e:
                 raise ConfigException(e.message)
+
+        # If debugging, log config
+        # log_level = logging.getLogger().level
+        # if log_level == logging.DEBUG:
+        #     for key in config:
+        #         logging.debug("app.config[{0}]={1}".format(key, config[key]))
+
+        return config
 
     @classmethod
     def get_config_from_env(cls):
         config = dict()
-        try:
-            config['SECRET_KEY'] = environ['SECRET_KEY']
-            config['DEFAULT_ACCESS_TOKEN'] = environ['DEFAULT_ACCESS_TOKEN']
-            config['DEFAULT_ACCESS_TOKEN_SECRET'] = environ['DEFAULT_ACCESS_TOKEN_SECRET']
-            config['APP_CONSUMER_KEY'] = environ['APP_CONSUMER_KEY']
-            config['APP_CONSUMER_SECRET'] = environ['APP_CONSUMER_SECRET']
-            config['DEFAULT_USER'] = environ['DEFAULT_USER']
-        except KeyError as ke:
-            raise ConfigException("Missing required environment variable: {}".format(ke))
+
+        for key in cls.MANDATORY_KEYS:
+            try:
+                config[key] = environ[key]
+            except KeyError as ke:
+                raise ConfigException("Missing mandatory environment variable: {}".format(ke))
+
+        for key in cls.OPTIONAL_KEYS:
+            try:
+                config[key] = environ[key]
+            except KeyError:
+                pass
+
         return config
 
 
