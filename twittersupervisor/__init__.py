@@ -51,4 +51,8 @@ def create_app(test_config=None):
         else:
             redirect(url_for('welcome'))
 
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('error.html', error_message=error), 404
+
     return app

@@ -45,5 +45,21 @@ const vm = new Vue({
                 this.getEvents(followerId)
             }
         }
+    },
+    filters: {
+    date: function (value) {
+        date = new Date(value);
+        formattedDate = date.getDate() < 10 ? '0': ''
+        formattedDate += date.getDate()
+        formattedDate += date.getMonth() < 9 ? '-0': '-'
+        formattedDate += (date.getMonth() + 1)
+        return formattedDate + '-' + date.getFullYear();
+    },
+    follows: function (value) {
+        if (value === 1) {
+            return "Follow";
+        }
+        return "Unfollow";
+    }
     }
 })

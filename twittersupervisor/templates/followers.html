@@ -2,9 +2,9 @@
 {% block containercontent %}
 <h2>Followers</h2>
 <div class="accordion" id="followers-accordion">
-    <div class="accordion-item" v-for="follower in followers">
+    <div class="accordion-item" v-for="follower in followers" :key="follower[0]">
         <h2 class="accordion-header" :id="'heading-' + follower[0]">
-<!--            -->
+
           <button v-bind:class="'accordion-button ' + collapsed(follower[0])"  type="button"
                   data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower[0]"
                   v-bind:aria-expanded="follower[0] == target_follower" v-bind:aria-controls="'collapse-' + follower[0]"
@@ -12,13 +12,28 @@
               [[ follower[1] ]]
           </button>
         </h2>
+
         <div :id="'collapse-' + follower[0]" :class="'accordion-collapse collapse ' + show(follower[0])"
              v-bind:aria-labelledby="'heading-' + follower[0]" data-bs-parent="#followers-accordion">
           <div class="accordion-body">
               <p>ID: [[ follower[0] ]]</p>
-              <p>Number of friendship events: [[events.length]]</p>
+              <table class="table" v-if="events.length > 0">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Event</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="event in events">
+                      <td>[[ event[1] | date ]]</td>
+                      <td>[[ event[2] | follows ]]</td>
+                    </tr>
+                  </tbody>
+            </table>
           </div>
         </div>
+
     </div>
 </div>
 
