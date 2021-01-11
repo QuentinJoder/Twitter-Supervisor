@@ -38,3 +38,9 @@
 </div>
 
 {% endblock %}
+
+{% block scripts %}
+<!--TODO use a stable version of Vue.js for production -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+{% endblock %}

@@ -1,7 +1,7 @@
 const api_prefix = '/api'
 
 const vm = new Vue({
-    el: '#twitter-supervisor',
+    el: '#followers-accordion',
     delimiters: ['[[', ']]'],
     data: {
         followers: [],
