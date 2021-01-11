@@ -2,13 +2,10 @@ import pytest
 from twitter import User, DirectMessage, UserStatus
 from flask import current_app
 from twittersupervisor import TwitterApi
-from tests import shared_test_data
+from tests import conftest
 
 
 class TestTwitterApi:
-    INCOMPLETE_CREDENTIALS = {'username': 'ausername', 'consumer_key': 'aconsumerkey',
-                              'consumer_secret': 'aconsumersecret',
-                              'access_token_secret': 'anaccesstokensecret'}
 
     @pytest.fixture(scope="class")
     def twitter_api(self, app):
@@ -32,7 +29,7 @@ class TestTwitterApi:
 
     @pytest.mark.api_call
     def test_get_user(self, twitter_api):
-        user, error = twitter_api.get_user(shared_test_data.TWITTER_USER_ID)
+        user, error = twitter_api.get_user(conftest.TWITTER_USER_ID)
         assert isinstance(user, User)
         assert user.name == 'Twitter'
         assert user.screen_name == 'Twitter'
@@ -40,7 +37,7 @@ class TestTwitterApi:
 
     @pytest.mark.api_call
     def test_get_friendship_lookup(self, twitter_api):
-        friendships = twitter_api.get_friendship_lookup([shared_test_data.TWITTER_USER_ID])
+        friendships = twitter_api.get_friendship_lookup([conftest.TWITTER_USER_ID])
         assert isinstance(friendships, list)
         friendship = friendships[0]
         assert isinstance(friendship, UserStatus)

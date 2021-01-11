@@ -3,6 +3,8 @@ import os
 import tempfile
 from twittersupervisor import create_app, Database
 
+TWITTER_USER_ID = 783214
+
 
 def pytest_addoption(parser):
     parser.addoption("--allow_api_call", action="store_true", default=False, help="Do the tests calling "

@@ -1,8 +1,0 @@
-{
-  "twitter_api": {
-    "username": "ausername",
-    "consumer_secret": "aconsumersecret",
-    "access_token": "anaccesstoken",
-    "access_token_secret": "anaccesstokensecret"
-  }
-}
