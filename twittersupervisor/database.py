@@ -45,6 +45,13 @@ class Database:
         connection.close()
         return result
 
+    def get_friendship_events(self, follower_id):
+        connection, cursor = self.open_connection()
+        cursor.execute("SELECT * from friendship_events where user_id = ?", (follower_id,))
+        result = cursor.fetchall()
+        connection.close()
+        return result
+
     def get_previous_followers_set(self):
         connection, cursor = self.open_connection()
         cursor.execute("SELECT id FROM followers")

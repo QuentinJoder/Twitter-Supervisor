@@ -2,14 +2,14 @@ from flask import current_app, Blueprint, request, render_template, session, url
 from tweepy import TweepError, OAuthHandler
 import logging
 
-from .database import Database
+from twittersupervisor.database import Database
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 oauth_store = {}
 
 
-@bp.route('/request-token')
+@auth_bp.route('/request-token')
 def request_token():
     callback_url = url_for('auth.callback', _external=True)
     logging.debug("Callback URL: {}".format(callback_url))
@@ -25,7 +25,7 @@ def request_token():
     return redirect(authorize_url)
 
 
-@bp.route('/callback')
+@auth_bp.route('/callback')
 def callback():
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')

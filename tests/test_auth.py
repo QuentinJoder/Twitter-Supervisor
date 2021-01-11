@@ -1,5 +1,5 @@
 from twittersupervisor import Database
-from twittersupervisor.auth import oauth_store
+from twittersupervisor.blueprints.auth import oauth_store
 from tweepy import OAuthHandler
 
 

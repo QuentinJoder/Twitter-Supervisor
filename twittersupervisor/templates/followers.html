@@ -1,22 +1,25 @@
 {% extends "index.html" %}
 {% block containercontent %}
 <h2>Followers</h2>
-<table class="table">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Screen Name</th>
-          <!--th scope="col">Display Name</th-->
-        </tr>
-      </thead>
-      <tbody>
-        {% for follower in followers %}
-        <tr>
-          <th scope="row">{{ follower[0] }}</th>
-          <th scope="row">{{ follower[1] }}</th>
-          <!--th scope="row">{{ follower.display_name }}</th-->
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="accordion" id="followers-accordion">
+    <div class="accordion-item" v-for="follower in followers">
+        <h2 class="accordion-header" :id="'heading-' + follower[0]">
+<!--            -->
+          <button v-bind:class="'accordion-button ' + collapsed(follower[0])"  type="button"
+                  data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower[0]"
+                  v-bind:aria-expanded="follower[0] == target_follower" v-bind:aria-controls="'collapse-' + follower[0]"
+                  v-on:click="toggle(follower[0])">
+              [[ follower[1] ]]
+          </button>
+        </h2>
+        <div :id="'collapse-' + follower[0]" :class="'accordion-collapse collapse ' + show(follower[0])"
+             v-bind:aria-labelledby="'heading-' + follower[0]" data-bs-parent="#followers-accordion">
+          <div class="accordion-body">
+              <p>ID: [[ follower[0] ]]</p>
+              <p>Number of friendship events: [[events.length]]</p>
+          </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

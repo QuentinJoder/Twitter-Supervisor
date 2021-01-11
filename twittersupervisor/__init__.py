@@ -1,13 +1,16 @@
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, url_for
 from os import path
 from sys import exit
 import logging
+
+from werkzeug.utils import redirect
 
 from .database import Database
 from .messaging import Messaging
 from .twitter_api import TwitterApi
 from .config import Config, ConfigException
-from .auth import bp as auth_bp
+from twittersupervisor.blueprints.auth import auth_bp
+from twittersupervisor.blueprints.api import api_bp
 
 CONFIG_FILE = 'config.cfg'
 
@@ -34,6 +37,7 @@ def create_app(test_config=None):
 
     # Blueprints and routes
     app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp)
 
     @app.route('/')
     @app.route('/welcome')
@@ -43,12 +47,8 @@ def create_app(test_config=None):
     @app.route('/followers')
     def followers():
         if 'username' in session:
-            username = session['username']
-            db = Database()
-            followers_list = db.get_followers()
-            logging.debug(followers_list)
-            return render_template('followers.html', username=username, followers=followers_list)
+            return render_template('followers.html')
         else:
-            render_template('error.html', error_message="You need to be logged in to access this page.")
+            redirect(url_for('welcome'))
 
     return app
