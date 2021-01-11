@@ -19,7 +19,7 @@ def pytest_collection_modifyitems(config, items):
 
 
 # Fixtures
-@pytest.fixture
+@pytest.fixture(scope="package")
 def app():
     db_fd, db_path = tempfile.mkstemp()
 

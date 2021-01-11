@@ -12,13 +12,14 @@ oauth_store = {}
 @auth_bp.route('/request-token')
 def request_token():
     callback_url = url_for('auth.callback', _external=True)
-    logging.debug("Callback URL: {}".format(callback_url))
+    logging.debug("App callback URL: {}".format(callback_url))
     auth = OAuthHandler(current_app.config['APP_CONSUMER_KEY'], current_app.config['APP_CONSUMER_SECRET'], callback_url)
+
     try:
         authorize_url = auth.get_authorization_url(signin_with_twitter=True)
     except TweepError as e:
         return render_template('error.html', error_message=e.reason)
-    logging.debug(authorize_url)
+
     oauth_token = auth.request_token['oauth_token']
     oauth_token_secret = auth.request_token['oauth_token_secret']
     oauth_store[oauth_token] = oauth_token_secret

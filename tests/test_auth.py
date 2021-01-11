@@ -1,9 +1,11 @@
 from twittersupervisor import Database
 from twittersupervisor.blueprints.auth import oauth_store
 from tweepy import OAuthHandler
+import pytest
 
 
 class TestAuth:
+    @pytest.mark.api_call
     def test_request_token(self, client, app):
         response = client.get('/auth/request-token')
         assert len(oauth_store) == 1

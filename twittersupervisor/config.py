@@ -63,7 +63,8 @@ class Config:
                                       .format(key, config_source))
 
         # Check if Twitter API keys work
-        if ('DEFAULT_ACCESS_TOKEN' in config) and ('DEFAULT_ACCESS_TOKEN_SECRET' in config):
+        if ('DEFAULT_ACCESS_TOKEN' in config) and ('DEFAULT_ACCESS_TOKEN_SECRET' in config) and \
+                ('TESTING' in config and not config['TESTING']):
             api = TwitterApi(config['DEFAULT_ACCESS_TOKEN'], config['DEFAULT_ACCESS_TOKEN_SECRET'],
                              config['APP_CONSUMER_KEY'], config['APP_CONSUMER_SECRET'])
             try:

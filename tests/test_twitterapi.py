@@ -10,7 +10,7 @@ class TestTwitterApi:
                               'consumer_secret': 'aconsumersecret',
                               'access_token_secret': 'anaccesstokensecret'}
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def twitter_api(self, app):
         with app.app_context():
             config_dict = current_app.config
