@@ -3,14 +3,15 @@ from twitter import Api, error
 import tweepy
 import logging
 
-
+# TODO Migrate to Twitter v2 when a python lib will manage it
+# TODO Raise TwitterApiException for each method failure
 class TwitterApi:
 
     MAX_USERNAME_LENGTH = 15
     DESTROY_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/destroy/:id.json"
     DESTROY_FAVORITE_ENDPOINT = "https://api.twitter.com/1.1/favorites/destroy.json"
 
-    # Rate limit per 15 minutes window # TODO use a queue
+    # Rate limit per 15 minutes window #
     POST_DIRECT_MESSAGE_RATE_LIMIT = 10
 
     # Maximum amount of friendships we can look at with "GET friendships/lookup"
@@ -80,6 +81,12 @@ class TwitterApi:
             logging.error('Unable to send direct message: {}'.format(e.message))
             return None
 
+    def delete_direct_message(self, dm_id):
+        try:
+            return self.tweepy_api.destroy_direct_message(id=dm_id)
+        except tweepy.TweepError as e:
+            raise TwitterApiException("Unable to delete direct message n°{}: {}".format(dm_id, e.reason))
+
     def get_user_timeline(self):
         try:
             return self.api.GetUserTimeline(screen_name=self.username, count=200, since_id=20)
@@ -141,3 +148,12 @@ class TwitterApi:
                 deleted_items.append(deleted_item)
             logging.info('Delete {0} n°{1} from {2}'.format(items_type, items[i].id, items[i].user.screen_name))
         return deleted_items
+
+
+class TwitterApiException(Exception):
+
+    def __init__(self, reason):
+        self.reason = reason
+
+    def __str__(self):
+        return self.reason

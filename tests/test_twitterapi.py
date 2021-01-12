@@ -5,6 +5,8 @@ from twittersupervisor import TwitterApi
 from tests import conftest
 
 
+# The purpose of this test class is to check if the libraries used to access the Twitter API and the API endpoints are
+# still working as intended
 class TestTwitterApi:
 
     @pytest.fixture(scope="class")
@@ -48,3 +50,4 @@ class TestTwitterApi:
     def test_send_message(self, twitter_api):
         message = twitter_api.send_direct_message("This is a test message.")
         assert isinstance(message, DirectMessage)
+        twitter_api.delete_direct_message(message.id)
