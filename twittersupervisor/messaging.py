@@ -3,14 +3,15 @@ import logging
 
 class Messaging:
 
-    def __init__(self, args, api, database):
+    def __init__(self, api, database, quiet=True):
         self.twitter_api = api
-        self.args = args
+        self.quiet = quiet
         self.database = database
 
     # TODO:
     #  i18n of the messages
     #  Handle special characters to show the "Display name" of the user
+    #  Handle big number of new followers
     def present_new_followers(self, followers_set):
         if len(followers_set) != 0:  # Avoid useless "GET friendships/lookup" request
             friendships_info = self.twitter_api.get_friendship_lookup(list(followers_set))
@@ -52,8 +53,11 @@ class Messaging:
                 logging.error(message)
                 self.publish_message(message)
 
+    def welcome_message(self):
+        self.publish_message("Welcome in Twitter Supervisor ! You will know from now on who stop following you !")
+
     def publish_message(self, message):
-        if self.args.quiet:
+        if self.quiet:
             logging.info(message)
         else:
             self.twitter_api.send_direct_message(message)

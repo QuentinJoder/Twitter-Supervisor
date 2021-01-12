@@ -6,7 +6,7 @@ from twitter import error
 
 class Config:
     LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET']
+    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET']  # , 'CELERY_BROKER_URL']
     OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'DATABASE_FILE',
                      'LOG_LEVEL', 'LOG_FILE']
     DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO",
@@ -82,19 +82,11 @@ class Config:
     @classmethod
     def get_config_from_env(cls):
         config = dict()
-
-        for key in cls.MANDATORY_KEYS:
-            try:
-                config[key] = environ[key]
-            except KeyError as ke:
-                raise ConfigException("Missing mandatory environment variable: {}".format(ke))
-
-        for key in cls.OPTIONAL_KEYS:
-            try:
-                config[key] = environ[key]
-            except KeyError:
-                pass
-
+        config_keys = cls.MANDATORY_KEYS + cls.OPTIONAL_KEYS
+        for key in config_keys:
+            env_value = environ.get(key, cls.DEFAULT_VALUES.get(key, None))
+            if env_value is not None:
+                config[key] = env_value
         return config
 
 

@@ -20,11 +20,11 @@ class TestMessaging:
             get_lookup.return_value = [UserStatus(id=783214, name="Twitter", screen_name="twitter")]
             with mock.patch('twittersupervisor.TwitterApi.send_direct_message', unsafe=True) as send_dm:
                 # Case quiet
-                messaging = Messaging(Namespace(quiet=True), twitter_api, database)
+                messaging = Messaging(twitter_api, database)
                 messaging.present_new_followers([conftest.TWITTER_USER_ID])
                 send_dm.assert_not_called()
                 # Case "not quiet"
-                messaging = Messaging(Namespace(quiet=False), twitter_api, database)
+                messaging = Messaging(twitter_api, database, quiet=False)
                 messaging.present_new_followers([conftest.TWITTER_USER_ID])
                 send_dm.assert_called_once()
 

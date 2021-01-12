@@ -46,15 +46,8 @@ class TestConfig:
                 assert perfect_config == Config.check_config(perfect_config, "ENV variables")
                 assert vc_mock.call_count == 2
 
-            def remove_random_key(key_list, a_dict):
-                keys_number = len(key_list)
-                number_to_remove = randint(0, keys_number - 1)
-                removed_key = key_list[number_to_remove]
-                a_dict.pop(removed_key)
-                return a_dict, removed_key
-
             # Missing optional key
-            imperfect_config, missing_key = remove_random_key(Config.OPTIONAL_KEYS, perfect_config)
+            imperfect_config, missing_key = self.remove_random_key(Config.OPTIONAL_KEYS, perfect_config)
             checked_config = Config.check_config(imperfect_config, "config.cfg")
             for key in imperfect_config:
                 if key is missing_key:
@@ -66,7 +59,7 @@ class TestConfig:
                     assert checked_config[key] == imperfect_config[key]
 
             # Missing mandatory key
-            invalid_config, missing_key = remove_random_key(Config.MANDATORY_KEYS, imperfect_config)
+            invalid_config, missing_key = self.remove_random_key(Config.MANDATORY_KEYS, imperfect_config)
             with raises(ConfigException) as exc_info:
                 Config.check_config(invalid_config, "config.cfg")
                 error_message = str("The mandatory config key '{0}' was not found in app config: {1}")
@@ -95,14 +88,26 @@ class TestConfig:
         config = Config.get_config_from_env()
         assert config == test_config
 
-        # Missing optional key
-        test_config.pop('DEFAULT_USER')
-        monkeypatch.delenv('DEFAULT_USER')
+        # Missing key with a default value
+        incomplete_config, missing_key = self.remove_random_key(list(Config.DEFAULT_VALUES.keys()), test_config)
+        monkeypatch.delenv(missing_key)
+        incomplete_config[missing_key] = Config.DEFAULT_VALUES[missing_key]
         config = Config.get_config_from_env()
-        assert config == test_config
+        assert config == incomplete_config
 
-        # Missing mandatory key
-        monkeypatch.delenv('APP_CONSUMER_KEY')
-        with raises(ConfigException) as exc_info:
-            Config.get_config_from_env()
-            assert exc_info.value.message == "Missing mandatory environment variable: 'APP_CONSUMER_KEY'"
+        # Missing key without default value
+        keys_without_default = list(test_config.keys())
+        for key in list(Config.DEFAULT_VALUES.keys()):
+            keys_without_default.remove(key)
+        another_config, missing_key = self.remove_random_key(keys_without_default, test_config)
+        monkeypatch.delenv(missing_key)
+        config = Config.get_config_from_env()
+        assert config == another_config
+
+    @staticmethod
+    def remove_random_key(key_list: list, a_dict: dict):
+        keys_number = len(key_list)
+        number_to_remove = randint(0, keys_number - 1)
+        removed_key = key_list[number_to_remove]
+        a_dict.pop(removed_key)
+        return a_dict, removed_key

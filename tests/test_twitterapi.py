@@ -1,4 +1,5 @@
 import pytest
+from time import sleep
 from twitter import User, DirectMessage, UserStatus
 from flask import current_app
 from twittersupervisor import TwitterApi
@@ -50,4 +51,5 @@ class TestTwitterApi:
     def test_send_message(self, twitter_api):
         message = twitter_api.send_direct_message("This is a test message.")
         assert isinstance(message, DirectMessage)
+        sleep(5)  # Wait for DM to be "published" to prevent deletion error
         twitter_api.delete_direct_message(message.id)
