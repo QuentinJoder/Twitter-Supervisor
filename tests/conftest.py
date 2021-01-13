@@ -27,8 +27,7 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'LOG_LEVEL': 'DEBUG',
-        'DATABASE_FILE': db_path,
+        'DATABASE_FILE': db_path
     })
 
     with app.app_context():

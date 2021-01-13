@@ -1,6 +1,7 @@
 import pytest
 from time import sleep
-from twitter import User, DirectMessage, UserStatus
+from twitter import User, UserStatus
+from tweepy import DirectMessage
 from flask import current_app
 from twittersupervisor import TwitterApi
 from tests import conftest
@@ -51,5 +52,5 @@ class TestTwitterApi:
     def test_send_message(self, twitter_api):
         message = twitter_api.send_direct_message("This is a test message.")
         assert isinstance(message, DirectMessage)
-        sleep(5)  # Wait for DM to be "published" to prevent deletion error
+        sleep(2)  # Wait for DM to be "published" to prevent deletion error
         twitter_api.delete_direct_message(message.id)

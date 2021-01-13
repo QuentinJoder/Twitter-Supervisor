@@ -5,6 +5,7 @@ import logging
 
 # TODO Migrate to Twitter v2 when a python lib will manage it
 # TODO Raise TwitterApiException for each method failure
+# TODO Stop using python-twitter because lib seem no longer maintained ?
 class TwitterApi:
 
     MAX_USERNAME_LENGTH = 15
@@ -73,13 +74,15 @@ class TwitterApi:
         except tweepy.TweepError as e:
             return None, e
 
+    # For Direct Messages use tweepy because python-twitter is not up to date with endpoints changed in Sep. 2018
+    # https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/guides/direct-message-migration
     def send_direct_message(self, text):
-        logging.info('Sending direct message: \"{}\"'.format(text))
+        logging.debug('Sending direct message: \"{}\"'.format(text))
         try:
-            return self.api.PostDirectMessage(text, screen_name=self.username)
-        except error.TwitterError as e:
-            logging.error('Unable to send direct message: {}'.format(e.message))
-            return None
+            user = self.tweepy_api.get_user(screen_name=self.username)
+            return self.tweepy_api.send_direct_message(text=text, recipient_id=user.id)
+        except tweepy.TweepError as e:
+            raise TwitterApiException('Unable to send direct message: {}'.format(e.reason))
 
     def delete_direct_message(self, dm_id):
         try:
