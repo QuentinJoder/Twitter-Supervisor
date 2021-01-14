@@ -9,7 +9,7 @@
                   data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower.id"
                   v-bind:aria-expanded="follower.id == target_follower" v-bind:aria-controls="'collapse-' + follower.id"
                   v-on:click="toggle(follower.id)">
-              [[ follower.display_name ]]
+              [[ follower.name ]]
           </button>
         </h2>
 

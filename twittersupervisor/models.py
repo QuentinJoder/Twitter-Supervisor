@@ -5,7 +5,7 @@ from . import db, TwitterApi
 
 class TwitterUser(db.Model, SerializerMixin):
     __tablename__ = 'twitter_user'
-    serialize_only = ('id', 'screen_name', 'display_name')
+    serialize_only = ('id', 'screen_name', 'name')
     id = db.Column(db.Integer, primary_key=True)
     screen_name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH), unique=True)
     name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH))
