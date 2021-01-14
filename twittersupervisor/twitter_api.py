@@ -8,7 +8,8 @@ import logging
 # TODO Stop using python-twitter because lib seem no longer maintained ?
 class TwitterApi:
 
-    MAX_USERNAME_LENGTH = 15
+    MAX_SCREEN_NAME_LENGTH = 15
+    MAX_NAME_LENGTH = 50
     DESTROY_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/destroy/:id.json"
     DESTROY_FAVORITE_ENDPOINT = "https://api.twitter.com/1.1/favorites/destroy.json"
 

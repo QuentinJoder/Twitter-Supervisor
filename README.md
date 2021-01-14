@@ -10,7 +10,7 @@ Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [t
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
 ## Requirements
-* **Python 3.5 to 3.9** (older versions are not tested) and **pip**
+* **Python 3.6 to 3.9** (other versions are not tested) and **pip**
 
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
 

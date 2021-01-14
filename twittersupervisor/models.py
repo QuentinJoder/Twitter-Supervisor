@@ -1,14 +1,14 @@
 from sqlalchemy_serializer import SerializerMixin
 
-from . import db
+from . import db, TwitterApi
 
 
 class TwitterUser(db.Model, SerializerMixin):
     __tablename__ = 'twitter_user'
     serialize_only = ('id', 'screen_name', 'display_name')
     id = db.Column(db.Integer, primary_key=True)
-    screen_name = db.Column(db.String(15), unique=True)
-    display_name = db.Column(db.String(50))
+    screen_name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH), unique=True)
+    name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH))
     type = db.Column(db.String(50))
 
     __mapper_args__ = {
@@ -17,7 +17,8 @@ class TwitterUser(db.Model, SerializerMixin):
     }
 
     def __repr__(self):
-        return "<TwitterUser id: {1}, screen_name: {1}, type: '{2}' >".format(self.id, self.screen_name, self.display_name)
+        return "<TwitterUser id: {1}, screen_name: {1}, name: '{2}' >".format(self.id, self.screen_name,
+                                                                              self.name)
 
 
 followers = db.Table('followers',
@@ -33,6 +34,7 @@ unfollowers = db.Table('unfollowers',
 
 class AppUser(TwitterUser):
     __tablename__ = 'app_user'
+    serialize_only = ('access_token', 'access_token_secret')
     access_token = db.Column(db.String)
     access_token_secret = db.Column(db.String)
     followers = db.relationship('TwitterUser', secondary=followers,

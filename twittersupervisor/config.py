@@ -32,7 +32,7 @@ class Config:
             return value
 
         def default_user():
-            if len(value) > TwitterApi.MAX_USERNAME_LENGTH:
+            if len(value) > TwitterApi.MAX_SCREEN_NAME_LENGTH:
                 return None
             return value
         # TODO LOW-PRIORITY: check if db file and log file have a valid name

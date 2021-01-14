@@ -58,7 +58,7 @@ def callback():
     api = TwitterApi(access_token=access_token, access_token_secret=access_token_secret)
     twitter_user = api.verify_credentials()
     logging.debug("Username: {}".format(twitter_user.screen_name))
-    user = AppUser(id=twitter_user.id, screen_name=twitter_user.screen_name, display_name=twitter_user.name,
+    user = AppUser(id=twitter_user.id, screen_name=twitter_user.screen_name, name=twitter_user.name,
                    access_token=access_token, access_token_secret=access_token_secret )
     db.session.merge(user)
     db.session.commit()
