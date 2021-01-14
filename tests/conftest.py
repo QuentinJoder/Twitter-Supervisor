@@ -1,7 +1,7 @@
 import pytest
 import os
 import tempfile
-from twittersupervisor import create_app, Database
+from twittersupervisor import create_app
 
 TWITTER_USER_ID = 783214
 
@@ -24,17 +24,12 @@ def pytest_collection_modifyitems(config, items):
 @pytest.fixture(scope="package")
 def app():
     db_fd, db_path = tempfile.mkstemp()
+    sqlite_link = 'sqlite:///' + db_path
 
     app = create_app({
         'TESTING': True,
-        'DATABASE_FILE': db_path
+        'SQLALCHEMY_DATABASE_URI': sqlite_link
     })
-
-    with app.app_context():
-        # init_db()
-        # get_db().executescript(_data_sql)
-        db = Database()
-        db.create_tables()
 
     yield app
 

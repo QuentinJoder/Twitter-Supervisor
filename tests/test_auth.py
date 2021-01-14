@@ -1,7 +1,9 @@
-from twittersupervisor import Database
+
 from twittersupervisor.blueprints.auth import oauth_store
 from tweepy import OAuthHandler
 import pytest
+
+from twittersupervisor.models import AppUser
 
 
 class TestAuth:
@@ -26,10 +28,10 @@ class TestAuth:
         # Nominal case
         with app.app_context():
             oauth_store['garbage'] = 'shit'
-            db = Database()
             client.get('/auth/callback?oauth_token=garbage&oauth_verifier=moregarbage')
             # Check if the given token and secret are stored in DB
-            (access_token, access_token_secret) = db.get_user_token_and_secret('JanKowalski')
+            user = AppUser.query.filter_by(screen_name='JanKowalski').first()
+            (access_token, access_token_secret) = user.access_token, user.access_token_secret
             assert access_token == 'access_token'
             assert access_token_secret == 'access_token_secret'
 

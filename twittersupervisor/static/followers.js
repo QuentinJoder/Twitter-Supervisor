@@ -15,13 +15,11 @@ const vm = new Vue({
         getFollowers: async function (){
             const response = await fetch(api_prefix + '/followers');
             const object = await response.json();
-            console.log(object)
             this.followers = object;
         },
         getEvents: async function (followerId){
             const response = await fetch(api_prefix + '/followers/' + followerId + '/events');
             const object = await response.json();
-            console.log(object)
             this.events = object;
         },
         collapsed: function (followerId) {

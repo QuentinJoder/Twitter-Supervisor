@@ -2,3 +2,5 @@ python-twitter
 pytest
 tweepy
 Flask
+Flask-SQLAlchemy
+SQLAlchemy-serializer

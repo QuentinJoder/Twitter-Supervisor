@@ -1,12 +1,13 @@
 import logging
 
+from twittersupervisor.models import TwitterUser
+
 
 class Messaging:
 
-    def __init__(self, api, database, quiet=True):
+    def __init__(self, api, quiet=True):
         self.twitter_api = api
         self.quiet = quiet
-        self.database = database
 
     # TODO:
     #  i18n of the messages
@@ -62,8 +63,10 @@ class Messaging:
         else:
             self.twitter_api.send_direct_message(message)
 
-    def _get_username(self, user_id):
-        name = self.database.get_username_by_id(user_id)
+    @staticmethod
+    def _get_username(user_id):
+        username = TwitterUser.query.filter_by(id=user_id).first()
+        name = username.screen_name
         if name is None:
             name = 'n°{}'.format(user_id)
         else:

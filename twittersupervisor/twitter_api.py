@@ -42,7 +42,7 @@ class TwitterApi:
 
     def verify_credentials(self):
         try:
-            return self.api.VerifyCredentials(None, True)
+            return self.api.VerifyCredentials(skip_status=True)
         except error.TwitterError as e:
             logging.error('An error happened while checking the Twitter API credentials validity: {}'.format(e.message))
             raise

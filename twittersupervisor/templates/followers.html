@@ -2,21 +2,22 @@
 {% block containercontent %}
 <h2>Followers</h2>
 <div class="accordion" id="followers-accordion">
-    <div class="accordion-item" v-for="follower in followers" :key="follower[0]">
-        <h2 class="accordion-header" :id="'heading-' + follower[0]">
+    <div class="accordion-item" v-for="follower in followers" :key="follower.id">
+        <h2 class="accordion-header" :id="'heading-' + follower.id">
 
-          <button v-bind:class="'accordion-button ' + collapsed(follower[0])"  type="button"
-                  data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower[0]"
-                  v-bind:aria-expanded="follower[0] == target_follower" v-bind:aria-controls="'collapse-' + follower[0]"
-                  v-on:click="toggle(follower[0])">
-              [[ follower[1] ]]
+          <button v-bind:class="'accordion-button ' + collapsed(follower.id)"  type="button"
+                  data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower.id"
+                  v-bind:aria-expanded="follower.id == target_follower" v-bind:aria-controls="'collapse-' + follower.id"
+                  v-on:click="toggle(follower.id)">
+              [[ follower.display_name ]]
           </button>
         </h2>
 
-        <div :id="'collapse-' + follower[0]" :class="'accordion-collapse collapse ' + show(follower[0])"
-             v-bind:aria-labelledby="'heading-' + follower[0]" data-bs-parent="#followers-accordion">
+        <div :id="'collapse-' + follower.id" :class="'accordion-collapse collapse ' + show(follower.id)"
+             v-bind:aria-labelledby="'heading-' + follower.id" data-bs-parent="#followers-accordion">
           <div class="accordion-body">
-              <p>ID: [[ follower[0] ]]</p>
+              <p>ID: [[ follower.id ]]</p>
+              <p>Screen name: [[ follower.screen_name ]]</p>
               <table class="table" v-if="events.length > 0">
                   <thead>
                     <tr>

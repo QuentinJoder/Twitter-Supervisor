@@ -6,11 +6,9 @@ from twitter import error
 
 class Config:
     LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET']  # , 'CELERY_BROKER_URL']
-    OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'DATABASE_FILE',
-                     'LOG_LEVEL', 'LOG_FILE']
-    DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO",
-                      'DATABASE_FILE': "instance/twitter_supervisor.db"}
+    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET', 'SQLALCHEMY_DATABASE_URI']  # , 'CELERY_BROKER_URL']
+    OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'LOG_LEVEL', 'LOG_FILE']
+    DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO"}
 
     @staticmethod
     def set_logging_config(log_file_name, log_level):

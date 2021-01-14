@@ -1,8 +1,8 @@
 from flask import current_app, Blueprint, request, render_template, session, url_for, redirect
 from tweepy import TweepError, OAuthHandler
 import logging
-
-from twittersupervisor.database import Database
+from twittersupervisor import db, TwitterApi
+from twittersupervisor.models import AppUser
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -55,11 +55,14 @@ def callback():
         logging.error("Unable to set access token & secret: {0}".format(error))
         return render_template('error.html', error_message=error.reason)
     auth.set_access_token(access_token, access_token_secret)
-    username = auth.get_username()
-    logging.debug("Username: {}".format(username))
-    db = Database()
-    db.create_user(username, access_token, access_token_secret)
-    session['username'] = username
+    api = TwitterApi(access_token=access_token, access_token_secret=access_token_secret)
+    twitter_user = api.verify_credentials()
+    logging.debug("Username: {}".format(twitter_user.screen_name))
+    user = AppUser(id=twitter_user.id, screen_name=twitter_user.screen_name, display_name=twitter_user.name,
+                   access_token=access_token, access_token_secret=access_token_secret )
+    db.session.merge(user)
+    db.session.commit()
+    session['username'] = user.screen_name
     return redirect(url_for('followers'))
 
 
