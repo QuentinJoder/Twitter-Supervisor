@@ -2,7 +2,7 @@ from sqlalchemy_serializer import SerializerMixin
 
 from . import db, TwitterApi
 
-
+# TODO Manage emojis and special characters in "name"
 class TwitterUser(db.Model, SerializerMixin):
     __tablename__ = 'twitter_user'
     serialize_only = ('id', 'screen_name', 'name')
@@ -45,7 +45,7 @@ class AppUser(TwitterUser):
                                   primaryjoin="TwitterUser.id == unfollowers.c.unfollowed_id",
                                   secondaryjoin="TwitterUser.id == unfollowers.c.unfollower_id",
                                   backref='unfollowing')
-    # TODO Foreign Key for Settings
+    # TODO Create a Model for Settings
 
     __mapper_args__ = {
         'polymorphic_identity': 'app_user'

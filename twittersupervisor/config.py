@@ -35,7 +35,6 @@ class Config:
             if len(value) > TwitterApi.MAX_SCREEN_NAME_LENGTH:
                 return None
             return value
-        # TODO LOW-PRIORITY: check if db file and log file have a valid name
         switcher = {'LOG_LEVEL': log_level, 'DEFAULT_USER': default_user}
         if key in switcher:
             return switcher[key]()

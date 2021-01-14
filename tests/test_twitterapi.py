@@ -18,8 +18,7 @@ class TestTwitterApi:
             return TwitterApi(access_token=config_dict['DEFAULT_ACCESS_TOKEN'],
                               access_token_secret=config_dict['DEFAULT_ACCESS_TOKEN_SECRET'],
                               consumer_key=config_dict['APP_CONSUMER_KEY'],
-                              consumer_secret=config_dict['APP_CONSUMER_SECRET'],
-                              username=config_dict['DEFAULT_USER'])
+                              consumer_secret=config_dict['APP_CONSUMER_SECRET'])
 
     @pytest.mark.api_call
     def test_verify_credentials(self, twitter_api):
@@ -49,8 +48,10 @@ class TestTwitterApi:
         assert friendship.screen_name == 'Twitter'
 
     @pytest.mark.api_call
-    def test_send_message(self, twitter_api):
-        message = twitter_api.send_direct_message("This is a test message.")
-        assert isinstance(message, DirectMessage)
-        sleep(2)  # Wait for DM to be "published" to prevent deletion error
-        twitter_api.delete_direct_message(message.id)
+    def test_send_message(self, twitter_api, app):
+        with app.app_context():
+            username = current_app.config['DEFAULT_USER']
+            message = twitter_api.send_direct_message(username, "This is a test message.")
+            assert isinstance(message, DirectMessage)
+            sleep(2)  # Wait for DM to be "published" to prevent deletion error
+            twitter_api.delete_direct_message(message.id)

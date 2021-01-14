@@ -19,8 +19,7 @@ class TwitterApi:
     # Maximum amount of friendships we can look at with "GET friendships/lookup"
     MAX_AMOUNT_FRIENDSHIPS_LOOKUP = 100
 
-    def __init__(self, access_token, access_token_secret, consumer_key=None, consumer_secret=None, username=None):
-        self.username = username
+    def __init__(self, access_token, access_token_secret, consumer_key=None, consumer_secret=None):
         if (consumer_key or consumer_secret) is None:
             consumer_key = current_app.config['APP_CONSUMER_KEY']
             consumer_secret = current_app.config['APP_CONSUMER_SECRET']
@@ -69,18 +68,18 @@ class TwitterApi:
             logging.critical('An error happened while looking up friendships: {}'.format(e.message))
             raise
 
-    def get_friendship_show(self, target_id):
+    def get_friendship_show(self, source_screen_name, target_id):
         try:
-            return self.tweepy_api.show_friendship(source_screen_name=self.username, target_id=target_id), None
+            return self.tweepy_api.show_friendship(source_screen_name=source_screen_name, target_id=target_id), None
         except tweepy.TweepError as e:
             return None, e
 
     # For Direct Messages use tweepy because python-twitter is not up to date with endpoints changed in Sep. 2018
     # https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/guides/direct-message-migration
-    def send_direct_message(self, text):
+    def send_direct_message(self, sender_screen_name, text):
         logging.debug('Sending direct message: \"{}\"'.format(text))
         try:
-            user = self.tweepy_api.get_user(screen_name=self.username)
+            user = self.tweepy_api.get_user(screen_name=sender_screen_name)
             return self.tweepy_api.send_direct_message(text=text, recipient_id=user.id)
         except tweepy.TweepError as e:
             raise TwitterApiException('Unable to send direct message: {}'.format(e.reason))
@@ -91,18 +90,18 @@ class TwitterApi:
         except tweepy.TweepError as e:
             raise TwitterApiException("Unable to delete direct message n°{}: {}".format(dm_id, e.reason))
 
-    def get_user_timeline(self):
+    def get_user_timeline(self, user_screen_name):
         try:
-            return self.api.GetUserTimeline(screen_name=self.username, count=200, since_id=20)
+            return self.api.GetUserTimeline(screen_name=user_screen_name, count=200, since_id=20)
         except error.TwitterError as e:
-            logging.error('Unable to get user @{0} timeline: {1}'.format(self.username, e.message))
+            logging.error('Unable to get user @{0} timeline: {1}'.format(user_screen_name, e.message))
             return None
 
-    def get_favorites(self):
+    def get_favorites(self, screen_name):
         try:
-            return self.api.GetFavorites(screen_name=self.username, count=200, since_id=20)
+            return self.api.GetFavorites(screen_name=screen_name, count=200, since_id=20)
         except error.TwitterError as e:
-            logging.error('Unable to get user @{0} favorites: {1}'.format(self.username, e.message))
+            logging.error('Unable to get user @{0} favorites: {1}'.format(screen_name, e.message))
             return None
 
     def delete_status(self, status_id):
