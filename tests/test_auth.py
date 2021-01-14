@@ -1,6 +1,7 @@
-
+from twittersupervisor import TwitterApi
 from twittersupervisor.blueprints.auth import oauth_store
 from tweepy import OAuthHandler
+from twitter import User
 import pytest
 
 from twittersupervisor.models import AppUser
@@ -19,11 +20,11 @@ class TestAuth:
         def mock_get_access_token(*args):
             return 'access_token', 'access_token_secret'
 
-        def mock_get_username(*args):
-            return 'JanKowalski'
+        def mock_get_user(*args):
+            return User(id=666, screen_name='JanKowalski', name='Jan Kowalski')
 
         monkeypatch.setattr(OAuthHandler, 'get_access_token', mock_get_access_token)
-        monkeypatch.setattr(OAuthHandler, "get_username", mock_get_username)
+        monkeypatch.setattr(TwitterApi, "verify_credentials", mock_get_user)
 
         # Nominal case
         with app.app_context():
@@ -39,6 +40,3 @@ class TestAuth:
         oauth_store['token'] = 'secret'
         client.get('/auth/callback?denied=token')
         assert 'token' not in oauth_store
-
-
-

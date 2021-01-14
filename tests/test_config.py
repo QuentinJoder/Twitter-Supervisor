@@ -41,7 +41,7 @@ class TestConfig:
                                   'DEFAULT_ACCESS_TOKEN': current_app.config['DEFAULT_ACCESS_TOKEN'],
                                   'DEFAULT_ACCESS_TOKEN_SECRET': current_app.config['DEFAULT_ACCESS_TOKEN_SECRET'],
                                   'DEFAULT_USER': current_app.config['DEFAULT_USER'],
-                                  'DATABASE_FILE': "df", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
+                                  'SQLALCHEMY_DATABASE_URI': "sdu", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
                 assert perfect_config == Config.check_config(perfect_config, "config.cfg")
                 assert perfect_config == Config.check_config(perfect_config, "ENV variables")
                 assert vc_mock.call_count == 2
@@ -74,7 +74,7 @@ class TestConfig:
             vc_mock.reset_mock()
             test_config = {'SECRET_KEY': "sk", 'APP_CONSUMER_KEY': "ack", 'APP_CONSUMER_SECRET': "acs",
                            'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_USER': "du",
-                           'DATABASE_FILE': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
+                           'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
             Config.check_config(test_config, "config.cfg")
             vc_mock.assert_not_called()
 
@@ -82,7 +82,7 @@ class TestConfig:
         # Perfect config
         test_config = {'SECRET_KEY': "sk", 'APP_CONSUMER_KEY': "ack", 'APP_CONSUMER_SECRET': "acs",
                        'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_ACCESS_TOKEN_SECRET': "dats", 'DEFAULT_USER': "du",
-                       'DATABASE_FILE': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
+                       'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
         for entry in test_config:
             monkeypatch.setenv(entry, test_config[entry])
         config = Config.get_config_from_env()
