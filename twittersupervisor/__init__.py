@@ -1,3 +1,5 @@
+from celery import Celery
+from celery.schedules import crontab
 from flask import Flask, render_template, session, url_for
 from os import path, environ
 from sys import exit
@@ -42,10 +44,10 @@ def create_app(test_config=None):
     db.init_app(app)
     with app.app_context():
         db.create_all()
+
+    # Blueprints and routes (Avoid circular import)
     from .blueprints.auth import auth_bp
     from .blueprints.api import api_bp
-
-    # Blueprints and routes
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
 
@@ -66,3 +68,31 @@ def create_app(test_config=None):
         return render_template('error.html', error_message=error), 404
 
     return app
+
+
+def create_celery_app(app=None):
+    app = app or create_app()
+    celery = Celery(
+        app.import_name,
+        broker=app.config['CELERY_BROKER_URL'],
+        result_backend=app.config['RESULT_BACKEND']
+    )
+    celery.conf.update(app.config)
+    celery.conf.beat_schedule = {
+        # Executes every Monday morning at 7:30 a.m.
+        'update_users_data': {
+            'task': 'twittersupervisor.tasks.update_users_data',
+            'schedule': crontab(minute='*/15'),
+            'args': (),
+        }
+    }
+    logging.debug(celery.conf.beat_schedule)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+

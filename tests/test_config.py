@@ -31,7 +31,7 @@ class TestConfig:
         assert Config.check_config_parameter('DEFAULT_USER', user) is None
 
     def test_check_config(self, app):
-        with patch('twittersupervisor.TwitterApi.verify_credentials') as vc_mock:
+        with patch('twittersupervisor.twitter_api.TwitterApi.verify_credentials') as vc_mock:
             vc_mock.return_value = "foo"
 
             # Perfect case

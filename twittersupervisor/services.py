@@ -1,5 +1,6 @@
 from twittersupervisor.twitter_api import TwitterApi
 from twittersupervisor.models import AppUser, FollowEvent, TwitterUser, db
+import logging
 
 
 class TwitterUserService:
@@ -22,7 +23,9 @@ class TwitterUserService:
             twitter_users.extend(twitter_api.get_users_lookup(users_id[start: users_amount]))
         # Persist in DB
         for user in twitter_users:
-            db.session.merge(TwitterUser(id=user.id, name=user.name, screen_name=user.screen_name))
+            db_user = TwitterUser(id=user.id, name=user.name, screen_name=user.screen_name)
+            logging.info(db_user)
+            db.session.merge(db_user)
         db.session.commit()
 
 

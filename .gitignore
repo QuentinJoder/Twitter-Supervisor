@@ -2,8 +2,11 @@
 instance/
 !instance/config.cfg.sample
 *.db
+*.sqlite3
 *.log
+dump.rdb
 drafts/
+celerybeat-schedule
 
 # Python
 virtualenv/
