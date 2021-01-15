@@ -3,7 +3,7 @@ from time import sleep
 from twitter import User, UserStatus
 from tweepy import DirectMessage
 from flask import current_app
-from twittersupervisor import TwitterApi
+from twittersupervisor.twitter_api import TwitterApi
 from tests import conftest
 
 

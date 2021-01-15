@@ -1,10 +1,9 @@
-from twittersupervisor import TwitterApi
+from twittersupervisor.twitter_api import TwitterApi
+from twittersupervisor.models import AppUser
 from twittersupervisor.blueprints.auth import oauth_store
 from tweepy import OAuthHandler
 from twitter import User
 import pytest
-
-from twittersupervisor.models import AppUser
 
 
 class TestAuth:

@@ -2,15 +2,11 @@ from flask import Flask, render_template, session, url_for
 from os import path, environ
 from sys import exit
 import logging
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import redirect
 
-# from .celery import make_celery
-from .twitter_api import TwitterApi
 from .config import Config, ConfigException
 
 CONFIG_FILE = 'config.cfg'
-db = SQLAlchemy()
 
 
 def create_app(test_config=None):
@@ -41,21 +37,17 @@ def create_app(test_config=None):
         logging.critical(ce.message)
         exit(1)
 
-    # Celery
-    # celery = make_celery(app)
-
     # SQLAlchemy
+    from .models import db
     db.init_app(app)
-
     with app.app_context():
-        import twittersupervisor.models
         db.create_all()
-        from .blueprints.auth import auth_bp
-        from .blueprints.api import api_bp
+    from .blueprints.auth import auth_bp
+    from .blueprints.api import api_bp
 
-        # Blueprints and routes
-        app.register_blueprint(auth_bp)
-        app.register_blueprint(api_bp)
+    # Blueprints and routes
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp)
 
     @app.route('/')
     @app.route('/welcome')

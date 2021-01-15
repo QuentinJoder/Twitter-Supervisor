@@ -1,14 +1,14 @@
 from flask import Blueprint, session, jsonify
 from werkzeug.exceptions import abort
-from twittersupervisor.services import TwitterUserService, FollowEventService
+from twittersupervisor.services import AppUserService, FollowEventService
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
-# TODO page results
+# TODO paging of results
 @api_bp.route('/followers')
 def get_followers():
     if 'username' in session:
-        followers = TwitterUserService.get_followers(session['username'])
+        followers = AppUserService.get_followers(session['username'])
         return jsonify(followers)
     else:
         abort(401)

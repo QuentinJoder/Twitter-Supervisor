@@ -1,8 +1,8 @@
 from flask import current_app, Blueprint, request, render_template, session, url_for, redirect
 from tweepy import TweepError, OAuthHandler
 import logging
-from twittersupervisor import db, TwitterApi
-from twittersupervisor.models import AppUser
+from twittersupervisor.twitter_api import TwitterApi
+from twittersupervisor.models import AppUser, db
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 

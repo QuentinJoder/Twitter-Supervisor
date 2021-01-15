@@ -61,6 +61,15 @@ class TwitterApi:
             logging.error('An error happened while searching for user n°{0}: {1}'.format(user_id, e.message))
             return None, e.message
 
+    MAX_USERS_LOOKUP_PER_WINDOW = 900
+    USER_IDS_PER_USERS_LOOKUP = 100
+
+    def get_users_lookup(self, users_id):
+        try:
+            return self.tweepy_api.lookup_users(user_ids=users_id)
+        except tweepy.TweepError as e:
+            raise TwitterApiException(reason=e.reason)
+
     def get_friendship_lookup(self, users_id):
         try:
             return self.api.LookupFriendship(users_id)

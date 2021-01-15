@@ -1,6 +1,8 @@
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
+from .twitter_api import TwitterApi
 
-from . import db, TwitterApi
+db = SQLAlchemy()
 
 # TODO Manage emojis and special characters in "name"
 class TwitterUser(db.Model, SerializerMixin):
