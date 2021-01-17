@@ -1,10 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from .twitter_api import TwitterApi
+import datetime
 
 db = SQLAlchemy()
 
-# TODO Manage emojis and special characters in "name"
+# TODO use dataclass to serialize ?
 class TwitterUser(db.Model, SerializerMixin):
     __tablename__ = 'twitter_user'
     serialize_only = ('id', 'screen_name', 'name')
@@ -19,7 +20,7 @@ class TwitterUser(db.Model, SerializerMixin):
     }
 
     def __repr__(self):
-        return "<TwitterUser id: {1}, screen_name: {1}, name: '{2}' >".format(self.id, self.screen_name,
+        return "<TwitterUser id: {0}, screen_name: {1}, name: '{2}' >".format(self.id, self.screen_name,
                                                                               self.name)
 
 
@@ -59,8 +60,12 @@ class AppUser(TwitterUser):
 
 class FollowEvent(db.Model, SerializerMixin):
     __tablename__ = 'follow_event'
-    serialize_only = ('id', 'followed_id', 'follower_id', 'following')
+    serialize_only = ('id', 'followed_id', 'follower_id', 'following', 'event_date')
     id = db.Column(db.Integer, primary_key=True)
     followed_id = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     follower_id = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     following = db.Column(db.Boolean, nullable=False)
+    event_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return '<FollowEvent %r>' % self.id

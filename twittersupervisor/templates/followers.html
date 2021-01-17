@@ -27,8 +27,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="event in events">
-                      <td>[[ event[1] | date ]]</td>
-                      <td>[[ event[2] | follows ]]</td>
+                      <td>[[ event.event_date | date ]]</td>
+                      <td>[[ event.following | follows ]]</td>
                     </tr>
                   </tbody>
             </table>

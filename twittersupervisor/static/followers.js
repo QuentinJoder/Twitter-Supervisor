@@ -20,6 +20,7 @@ const vm = new Vue({
         getEvents: async function (followerId){
             const response = await fetch(api_prefix + '/followers/' + followerId + '/events');
             const object = await response.json();
+            console.log(object)
             this.events = object;
         },
         collapsed: function (followerId) {
@@ -46,15 +47,16 @@ const vm = new Vue({
     },
     filters: {
     date: function (value) {
-        date = new Date(value);
-        formattedDate = date.getDate() < 10 ? '0': ''
-        formattedDate += date.getDate()
-        formattedDate += date.getMonth() < 9 ? '-0': '-'
-        formattedDate += (date.getMonth() + 1)
-        return formattedDate + '-' + date.getFullYear();
+//        date = new Date(value);
+//        formattedDate = date.getDate() < 10 ? '0': ''
+//        formattedDate += date.getDate()
+//        formattedDate += date.getMonth() < 9 ? '-0': '-'
+//        formattedDate += (date.getMonth() + 1)
+//        return formattedDate + '-' + date.getFullYear();
+        return value
     },
     follows: function (value) {
-        if (value === 1) {
+        if (value) {
             return "Follow";
         }
         return "Unfollow";

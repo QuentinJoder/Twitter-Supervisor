@@ -5,7 +5,8 @@ Twitter Supervisor informs you (via direct message) when someone follows or unfo
 your old tweets, retweets and favorites.
 
 Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [tweepy](https://www.tweepy.org/) and 
-[python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API.
+[python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API. It uses the [celery](https://docs.celeryproject.org/en/stable/index.html)
+framework to manage periodic tasks and use [Redis](https://redis.io/) as a message broker.
 
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
@@ -13,6 +14,8 @@ Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [t
 * **Python 3.6 to 3.9** (other versions are not tested) and **pip**
 
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
+
+* **Redis**
 
 ## How to run the app
 
@@ -35,51 +38,64 @@ Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [t
 
 * Run `$ pip install -Ur requirements.txt` in the virtual environment to install dependencies.
 
-* There are two ways to give to the app the Twitter API credentials you created and other config parameters:
-    1) Create a `config.cfg` file in the `/instance` folder where you put the config keys. There is already a skeleton 
-    called `config.cfg.sample` in the aforementioned folder that you can fill and rename.
+### Configuration
+There are two ways to give to the app the Twitter API credentials you created and other config parameters:
 
-        ```properties
-        ## MANDATORY
-        # Required by flask.session, run `$ python -c 'import os; print(os.urandom(16))'` to get one
-        SECRET_KEY= b'...'
-        
-        # TWITTER API
-        APP_CONSUMER_KEY='aConsumerKey'
-        APP_CONSUMER_SECRET='aConsumerSecret'
-        
-        # DATABASE (Twitter Supervisor uses an SQLite database)
-        DATABASE_FILE='instance/twittersupervisor.db'
-        
-        ## OPTIONAL
-        # TWITTER CREDENTIALS (Needed if you want to run tests)
-        DEFAULT_ACCESS_TOKEN='aUserAccessToken'
-        DEFAULT_ACCESS_TOKEN_SECRET='aUserAccessTokenSecret'
-        DEFAULT_USER='aUser'
-        
-        # LOGGING
-        LOG_LEVEL='WARNING'
-        LOG_FILE='twitter_supervisor.log'
-        ```
+1) Create a `config.cfg` file where you put the config keys:
+
+    There is already a skeleton called `config.cfg.sample` in the `/instance` folder that you can fill and rename.
+    By default, the app will look in this folder to get it, but you can put it elsewhere and tell Twitter-Supervisor
+    where tho find it with `$ export FLASK_INSTANCE_PATH=/path/to/instance/folder`
+
+    ```properties
+    ## MANDATORY
+    # Required by flask.session, run `$ python -c 'import os; print(os.urandom(16))'` to get one
+    SECRET_KEY= b'...'
+    
+    # TWITTER API
+    APP_CONSUMER_KEY='aConsumerKey'
+    APP_CONSUMER_SECRET='aConsumerSecret'
+    
+    # DATABASE (Twitter Supervisor uses an SQLite database)
+    DATABASE_FILE='instance/twittersupervisor.db'
+    
+    ## OPTIONAL
+    # TWITTER CREDENTIALS (Needed if you want to run tests)
+    DEFAULT_ACCESS_TOKEN='aUserAccessToken'
+    DEFAULT_ACCESS_TOKEN_SECRET='aUserAccessTokenSecret'
+    DEFAULT_USER='aUser'
+    
+    # LOGGING
+    LOG_LEVEL='WARNING'
+    LOG_FILE='twitter_supervisor.log'
+    ```
   
-    2) Or define all the parameters above as environment variables with `export` in Linux (`SET` in Windows) before you run
-     or test the app:
-        ```shell script
-        $ export DEFAULT_USER=JohnSmith
-        $ export DEFAULT_ACCESS_TOKEN=pEeIsStOrEdInThEbAlLs
-        $ ...
-        ```
-* You can now run [tests](#Tests) to check if everything works and run the app !
+2) Or define all the parameters above as environment variables with `export` in Linux (`SET` in Windows) before you run
+or test the app:
+
+    ```shell script
+    $ export DEFAULT_USER=JohnSmith
+    $ export DEFAULT_ACCESS_TOKEN=pEeIsStOrEdInThEbAlLs
+    $ ...
+    ```
+
+You can now run [tests](#Tests) to check if everything works and run the app !
 
 ### Run the app
-Like any Flask application, launch Twitter-Supervisor with:
-```shell script
-$ export FLASK_APP=twittersupervisor
-$ flask run
-```
-There is a `flask_run.sh` script in the project files which does that.
+* Launch the redis server with: `$ redis-server`
 
-`$ ./flask_run.sh development`  launch the live server in [Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode).
+* Like a regular Flask application, launch Twitter-Supervisor with:
+    ```shell script
+    $ export FLASK_APP=twittersupervisor
+    $ flask run
+    ```
+    There is a `flask_run.sh` script in the project files which does that, and if you want to launch the live server in
+    [Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode), run: `$ ./flask_run.sh development`
+    
+*  Launch the celery workers (more info about that [here](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#starting-the-scheduler)):
+    - `celery -A twittersupervisor.tasks beat` to launch the scheduler
+    - `celery -A twittersupervisor.tasks worker` to launch a worker
+    - `celery -A twittersupervisor.tasks worker -B` useful in development, to launch one worker with the scheduler embedded.
 
 ### Tests
 in the project directory, simply run: 

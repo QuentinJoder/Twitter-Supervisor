@@ -1,3 +1,5 @@
+import datetime
+from flask.json import JSONEncoder
 import logging
 from os import environ
 from .twitter_api import TwitterApi
@@ -91,3 +93,17 @@ class ConfigException(Exception):
 
     def __init__(self, reason):
         self.message = reason
+
+
+class CustomJSONEncoder(JSONEncoder):
+
+    def default(self, o):
+        logging.info(o)
+        if type(o) == datetime.timedelta:
+            return str(o)
+        elif type(o) == datetime.datetime:
+            return o.isoformat()
+        elif type(o) == int:
+            return str(o)
+        else:
+            return super().default(o)
