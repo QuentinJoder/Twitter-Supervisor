@@ -35,7 +35,6 @@ jobs:
 
     - name: Test with pytest
       env:
-          SQLALCHEMY_TRACK_MODIFICATIONS: 'False'
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEFAULT_ACCESS_TOKEN: ${{ secrets.DEFAULT_ACCESS_TOKEN }}
           DEFAULT_ACCESS_TOKEN_SECRET: ${{ secrets.DEFAULT_ACCESS_TOKEN_SECRET }}

@@ -83,7 +83,8 @@ class TestConfig:
         # Perfect config
         test_config = {'SECRET_KEY': "sk", 'APP_CONSUMER_KEY': "ack", 'APP_CONSUMER_SECRET': "acs",
                        'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_ACCESS_TOKEN_SECRET': "dats", 'DEFAULT_USER': "du",
-                       'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
+                       'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'CELERY_BROKER_URL': 'cbu', 'LOG_LEVEL': "DEBUG",
+                       'LOG_FILE': "lf.log"}
         for entry in test_config:
             monkeypatch.setenv(entry, test_config[entry])
         config = Config.get_config_from_env()

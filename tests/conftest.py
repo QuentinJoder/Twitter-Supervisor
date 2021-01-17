@@ -28,7 +28,8 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': sqlite_link
+        'SQLALCHEMY_DATABASE_URI': sqlite_link,
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False
     })
 
     yield app

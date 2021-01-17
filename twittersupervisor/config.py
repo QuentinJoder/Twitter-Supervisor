@@ -9,7 +9,8 @@ class Config:
     MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET', 'SQLALCHEMY_DATABASE_URI',
                       'CELERY_BROKER_URL']
     OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'LOG_LEVEL', 'LOG_FILE']
-    DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO"}
+    DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO",
+                      'CELERY_BROKER_URL': 'redis://localhost:6379/0'}
 
     @staticmethod
     def set_logging_config(log_file_name, log_level):
@@ -77,6 +78,7 @@ class Config:
 
         return config
 
+    '''Get config from environment variables/default values'''
     @classmethod
     def get_config_from_env(cls):
         config = dict()
