@@ -1,5 +1,3 @@
-import datetime
-from flask.json import JSONEncoder
 import logging
 from os import environ
 from .twitter_api import TwitterApi
@@ -8,7 +6,8 @@ from twitter import error
 
 class Config:
     LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET', 'SQLALCHEMY_DATABASE_URI']  # , 'CELERY_BROKER_URL']
+    MANDATORY_KEYS = ['SECRET_KEY', 'APP_CONSUMER_KEY', 'APP_CONSUMER_SECRET', 'SQLALCHEMY_DATABASE_URI',
+                      'CELERY_BROKER_URL']
     OPTIONAL_KEYS = ['DEFAULT_ACCESS_TOKEN', 'DEFAULT_ACCESS_TOKEN_SECRET', 'DEFAULT_USER', 'LOG_LEVEL', 'LOG_FILE']
     DEFAULT_VALUES = {'LOG_FILE': "twitter_supervisor.log", 'LOG_LEVEL': "INFO"}
 
@@ -93,17 +92,3 @@ class ConfigException(Exception):
 
     def __init__(self, reason):
         self.message = reason
-
-
-class CustomJSONEncoder(JSONEncoder):
-
-    def default(self, o):
-        logging.info(o)
-        if type(o) == datetime.timedelta:
-            return str(o)
-        elif type(o) == datetime.datetime:
-            return o.isoformat()
-        elif type(o) == int:
-            return str(o)
-        else:
-            return super().default(o)

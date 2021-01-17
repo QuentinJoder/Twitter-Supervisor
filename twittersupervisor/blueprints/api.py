@@ -14,9 +14,13 @@ def get_followers():
         abort(401)
 
 
-@api_bp.route('/followers/<int:follower_id>/events')
-def events(follower_id):
+@api_bp.route('/followers/<string:follower_id_str>/events')
+def events(follower_id_str):
     if 'username' in session:
+        try:
+            follower_id = int(follower_id_str)
+        except ValueError:
+            abort(400)
         events_list = FollowEventService.get_follow_events(session['username'], follower_id)
         return jsonify(events_list)
     else:

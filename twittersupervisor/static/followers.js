@@ -24,19 +24,19 @@ const vm = new Vue({
             this.events = object;
         },
         collapsed: function (followerId) {
-            if (followerId !== this.target_follower) {
+            if (followerId.localeCompare(this.target_follower) !== 0) {
                 return 'collapsed'
             }
             return ''
         },
         show: function (followerId) {
-            if (followerId === this.target_follower) {
+            if (followerId.localeCompare(this.target_follower) === 0) {
                 return 'show'
             }
             return ''
         },
         toggle: function(followerId) {
-            if(this.target_follower === followerId) {
+            if(followerId.localeCompare(this.target_follower) === 0) {
                 this.target_follower = null
                 this.events = []
             } else {
@@ -47,12 +47,7 @@ const vm = new Vue({
     },
     filters: {
     date: function (value) {
-//        date = new Date(value);
-//        formattedDate = date.getDate() < 10 ? '0': ''
-//        formattedDate += date.getDate()
-//        formattedDate += date.getMonth() < 9 ? '-0': '-'
-//        formattedDate += (date.getMonth() + 1)
-//        return formattedDate + '-' + date.getFullYear();
+         // TODO: Decide what date format to use
         return value
     },
     follows: function (value) {

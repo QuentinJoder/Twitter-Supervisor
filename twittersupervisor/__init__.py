@@ -6,7 +6,7 @@ from sys import exit
 import logging
 from werkzeug.utils import redirect
 
-from .config import Config, ConfigException, CustomJSONEncoder
+from .config import Config, ConfigException
 
 CONFIG_FILE = 'config.cfg'
 
@@ -45,8 +45,6 @@ def create_app(test_config=None):
     with app.app_context():
         db.create_all()
 
-    app.json_encoder = CustomJSONEncoder
-
     # Blueprints and routes (Avoid circular import)
     from .blueprints.auth import auth_bp
     from .blueprints.api import api_bp
@@ -76,19 +74,18 @@ def create_celery_app(app=None):
     app = app or create_app()
     celery = Celery(
         app.import_name,
-        broker=app.config['CELERY_BROKER_URL'],
-        result_backend=app.config['RESULT_BACKEND']
+        broker=app.config['CELERY_BROKER_URL']
     )
     celery.conf.update(app.config)
     celery.conf.beat_schedule = {
         'check_followers': {
             'task': 'twittersupervisor.tasks.check_app_users_followers',
-            'schedule': crontab(minute='*/2'),
+            'schedule': crontab(minute='*/15'),
             'args': (),
         },
         'update_users_data': {
             'task': 'twittersupervisor.tasks.update_users_data',
-            'schedule': crontab(minute='*/2'),
+            'schedule': crontab(minute='*/15'),
             'args': (),
         }
     }

@@ -10,6 +10,7 @@ class TwitterApi:
 
     MAX_SCREEN_NAME_LENGTH = 15
     MAX_NAME_LENGTH = 50
+    MAX_ID_STRING_LENGTH = 20
     DESTROY_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/destroy/:id.json"
     DESTROY_FAVORITE_ENDPOINT = "https://api.twitter.com/1.1/favorites/destroy.json"
 

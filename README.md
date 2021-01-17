@@ -11,7 +11,8 @@ framework to manage periodic tasks and use [Redis](https://redis.io/) as a messa
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
 ## Requirements
-* **Python 3.6 to 3.9** (other versions are not tested) and **pip**
+* **Python 3.7 to 3.9** (and **pip**): older versions are not tested and don't work because the app uses
+[dataclasses](https://docs.python.org/fr/3/library/dataclasses.html), a feature introduced in Python 3.7.
 
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
 

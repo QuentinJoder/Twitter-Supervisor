@@ -1,15 +1,21 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import SerializerMixin
 from .twitter_api import TwitterApi
 import datetime
+from dataclasses import dataclass
 
 db = SQLAlchemy()
 
-# TODO use dataclass to serialize ?
-class TwitterUser(db.Model, SerializerMixin):
+
+@dataclass
+class TwitterUser(db.Model):
+    id: int
+    id_str: str
+    screen_name: str
+    name: str
+
     __tablename__ = 'twitter_user'
-    serialize_only = ('id', 'screen_name', 'name')
     id = db.Column(db.Integer, primary_key=True)
+    id_str = db.Column(db.String(TwitterApi.MAX_ID_STRING_LENGTH))
     screen_name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH), unique=True)
     name = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH))
     type = db.Column(db.String(50))
@@ -18,10 +24,6 @@ class TwitterUser(db.Model, SerializerMixin):
         'polymorphic_identity': 'twitter_user',
         'polymorphic_on': type
     }
-
-    def __repr__(self):
-        return "<TwitterUser id: {0}, screen_name: {1}, name: '{2}' >".format(self.id, self.screen_name,
-                                                                              self.name)
 
 
 followers = db.Table('followers',
@@ -35,9 +37,12 @@ unfollowers = db.Table('unfollowers',
                        )
 
 
+@dataclass
 class AppUser(TwitterUser):
+    access_token: str
+    access_token_secret: str
+
     __tablename__ = 'app_user'
-    serialize_only = ('access_token', 'access_token_secret')
     access_token = db.Column(db.String)
     access_token_secret = db.Column(db.String)
     followers = db.relationship('TwitterUser', secondary=followers,
@@ -54,18 +59,19 @@ class AppUser(TwitterUser):
         'polymorphic_identity': 'app_user'
     }
 
-    def __repr__(self):
-        return '<AppUser %r>' % self.screen_name
 
+@dataclass
+class FollowEvent(db.Model):
+    id: int
+    followed_id: int
+    follower_id: int
+    following: bool
+    event_date: datetime.datetime
 
-class FollowEvent(db.Model, SerializerMixin):
     __tablename__ = 'follow_event'
-    serialize_only = ('id', 'followed_id', 'follower_id', 'following', 'event_date')
     id = db.Column(db.Integer, primary_key=True)
     followed_id = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     follower_id = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     following = db.Column(db.Boolean, nullable=False)
     event_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    def __repr__(self):
-        return '<FollowEvent %r>' % self.id

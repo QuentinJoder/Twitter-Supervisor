@@ -1,5 +1,3 @@
-import logging
-
 from twittersupervisor.models import db, FollowEvent, AppUser
 import datetime
 
@@ -10,10 +8,7 @@ class FollowEventService:
     def get_follow_events(username: str, follower_id: int):
         user = AppUser.query.filter_by(screen_name=username).one()
         events_list = FollowEvent.query.filter_by(followed_id=user.id, follower_id=follower_id).all()
-        serialized_events = []
-        for event in events_list:
-            serialized_events.append(event.to_dict())
-        return serialized_events
+        return events_list
 
     @classmethod
     def create_follow_events(cls, target_id: int, new_followers_set: set, unfollowers_set: set):
