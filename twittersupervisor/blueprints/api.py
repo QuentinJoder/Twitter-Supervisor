@@ -1,6 +1,6 @@
 from flask import Blueprint, session, jsonify
 from werkzeug.exceptions import abort
-from twittersupervisor.services import AppUserService, FollowEventService
+from twittersupervisor.services import ApiService
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -8,7 +8,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 @api_bp.route('/followers')
 def get_followers():
     if 'username' in session:
-        followers = AppUserService.get_followers(session['username'])
+        followers = ApiService.get_followers(session['username'])
         return jsonify(followers)
     else:
         abort(401)
@@ -21,7 +21,7 @@ def events(follower_id_str):
             follower_id = int(follower_id_str)
         except ValueError:
             abort(400)
-        events_list = FollowEventService.get_follow_events(session['username'], follower_id)
+        events_list = ApiService.get_follow_events(session['username'], follower_id)
         return jsonify(events_list)
     else:
         abort(401)

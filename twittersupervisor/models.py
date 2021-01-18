@@ -41,6 +41,8 @@ unfollowers = db.Table('unfollowers',
 class AppUser(TwitterUser):
     access_token: str
     access_token_secret: str
+    followers: list[TwitterUser]
+    unfollowers: list[TwitterUser]
 
     __tablename__ = 'app_user'
     access_token = db.Column(db.String)
