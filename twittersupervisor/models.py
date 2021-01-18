@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from typing import List
+
 from .twitter_api import TwitterApi
 import datetime
 from dataclasses import dataclass
@@ -37,11 +39,11 @@ class AppUser(TwitterUser):
     __tablename__ = 'app_user'
     access_token: str = db.Column(db.String)
     access_token_secret: str = db.Column(db.String)
-    followers: list[TwitterUser] = db.relationship('TwitterUser', secondary=followers,
+    followers: List[TwitterUser] = db.relationship('TwitterUser', secondary=followers,
                                                    primaryjoin="TwitterUser.id == followers.c.followed_id",
                                                    secondaryjoin="TwitterUser.id == followers.c.follower_id",
                                                    backref='following')
-    unfollowers: list[TwitterUser] = db.relationship('TwitterUser', secondary=unfollowers,
+    unfollowers: List[TwitterUser] = db.relationship('TwitterUser', secondary=unfollowers,
                                                      primaryjoin="TwitterUser.id == unfollowers.c.unfollowed_id",
                                                      secondaryjoin="TwitterUser.id == unfollowers.c.unfollower_id",
                                                      backref='unfollowing')
