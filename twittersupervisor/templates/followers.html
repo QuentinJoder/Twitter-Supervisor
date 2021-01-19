@@ -1,63 +1,39 @@
-{% extends "index.html" %}
-{% block containercontent %}
-<div class="container" id="app-content">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-    <!--    <a class="navbar-brand" href="/">Twitter Supervisor</a>-->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a :class="'nav-link ' + active('/followers')" href="/followers">Followers</a>
-            <a :class="'nav-link ' + active('/unfollowers')" href="/unfollowers">Unfollowers</a>
-            <a class="nav-link" href="#">Account settings</a>
+{% extends "navbar.html" %}
+{% block under_navbar %}
+<div class="accordion" id="followers-accordion">
+    <div class="accordion-item" v-for="follower in followers" :key="follower.id_str">
+
+        <h2 class="accordion-header" :id="'heading-' + follower.id_str">
+            <button v-bind:class="'accordion-button ' + collapsed(follower.id_str)"  type="button"
+                  data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower.id_str"
+                  v-bind:aria-expanded="follower.id_str.localeCompare(target_follower) == 0" v-bind:aria-controls="'collapse-' + follower.id_str"
+                  v-on:click="toggle(follower.id_str)">
+              [[ follower.name ]]
+            </button>
+        </h2>
+
+        <div :id="'collapse-' + follower.id_str" :class="'accordion-collapse collapse ' + show(follower.id_str)"
+             v-bind:aria-labelledby="'heading-' + follower.id_str" data-bs-parent="#followers-accordion">
+            <div class="accordion-body">
+                <p>ID: [[ follower.id_str ]]</p>
+                <p>Screen name: @[[ follower.screen_name ]]</p>
+                <table class="table" v-if="events.length > 0">
+                    <thead>
+                        <tr>
+                          <th scope="col">Date</th>
+                          <th scope="col">Event</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="event in events">
+                          <td>[[ event.event_date | date ]]</td>
+                          <td>[[ event.following | follows ]]</td>
+                        </tr>
+                    </tbody>
+                </table>
           </div>
         </div>
-      </div>
-    </nav>
 
-    <div class="accordion" id="followers-accordion">
-        <div class="accordion-item" v-for="follower in followers" :key="follower.id_str">
-            <h2 class="accordion-header" :id="'heading-' + follower.id_str">
-
-              <button v-bind:class="'accordion-button ' + collapsed(follower.id_str)"  type="button"
-                      data-bs-toggle="collapse" v-bind:data-bs-target="'#collapse-' + follower.id_str"
-                      v-bind:aria-expanded="follower.id_str.localeCompare(target_follower) == 0" v-bind:aria-controls="'collapse-' + follower.id_str"
-                      v-on:click="toggle(follower.id_str)">
-                  [[ follower.name ]]
-              </button>
-            </h2>
-
-            <div :id="'collapse-' + follower.id_str" :class="'accordion-collapse collapse ' + show(follower.id_str)"
-                 v-bind:aria-labelledby="'heading-' + follower.id_str" data-bs-parent="#followers-accordion">
-                <div class="accordion-body">
-                    <p>ID: [[ follower.id_str ]]</p>
-                    <p>Screen name: @[[ follower.screen_name ]]</p>
-                    <table class="table" v-if="events.length > 0">
-                        <thead>
-                            <tr>
-                              <th scope="col">Date</th>
-                              <th scope="col">Event</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="event in events">
-                              <td>[[ event.event_date | date ]]</td>
-                              <td>[[ event.following | follows ]]</td>
-                            </tr>
-                        </tbody>
-                    </table>
-              </div>
-            </div>
-
-        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<!--TODO use a stable version of Vue.js for production -->
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="{{ url_for('static', filename='followers.js') }}"></script>
 {% endblock %}

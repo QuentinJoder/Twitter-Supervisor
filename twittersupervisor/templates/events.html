@@ -1,0 +1,27 @@
+{% extends "navbar.html" %}
+{% block under_navbar %}
+
+<table class="table" id="events_table">
+    <thead>
+        <tr>
+<!--            <th scope="col">ID</th>-->
+            <th scope="col">Date</th>
+            <th scope="col">Screen Name</th>
+            <th scope="col">Name</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr id="{{ event.id }}">
+<!--            <td>{{ event.id }}</td>-->
+            <td>{{ event.event_date}}</td>
+            <td>{{ event.user_screen_name }}</td>
+            <td>{{ event.user_name }}</td>
+            <td>{{ 'Follow' if event.following else 'Unfollow'}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

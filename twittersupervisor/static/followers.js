@@ -9,12 +9,14 @@ const vm = new Vue({
         target_follower: null,
     },
     created() {
-        this.getUsers()
+        if(window.location.pathname !== '/events') {
+            this.getUsers(window.location.pathname)
+        }
     },
     methods: {
         // API calls
-        getUsers: async function (){
-            const response = await fetch(api_prefix + window.location.pathname);
+        getUsers: async function (path){
+            const response = await fetch(api_prefix + path);
             const object = await response.json();
             this.followers = object;
         },

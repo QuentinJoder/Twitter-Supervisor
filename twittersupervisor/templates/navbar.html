@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block app_container %}
+<div class="container" id="app-content">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                    aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a :class="'nav-link ' + active('/events')" href="/events">Events</a>
+                    <a :class="'nav-link ' + active('/followers')" href="/followers">Followers</a>
+                    <a :class="'nav-link ' + active('/unfollowers')" href="/unfollowers">Unfollowers</a>
+                    <a class="nav-link" href="#">Account settings</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% block under_navbar %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!--TODO use a stable version of Vue.js for production -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="{{ url_for('static', filename='followers.js') }}"></script>
+{% endblock %}

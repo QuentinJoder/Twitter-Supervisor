@@ -57,6 +57,6 @@ def callback():
     auth.set_access_token(access_token, access_token_secret)
     user = AuthService.create_app_user(access_token=access_token, access_token_secret=access_token_secret)
     session['username'] = user.screen_name
-    return redirect(url_for('pages.followers'))
+    return redirect(url_for('pages.events'))
 
 

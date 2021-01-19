@@ -1,7 +1,25 @@
-from twittersupervisor.models import AppUser, FollowEvent
+import logging
+from dataclasses import dataclass
+from datetime import datetime
+
+from twittersupervisor.models import AppUser, FollowEvent, TwitterUser, db
 
 
 class ApiService:
+
+    @staticmethod
+    def get_events(username: str):
+        user = AppUser.query.filter_by(screen_name=username).one()
+        follow_events = FollowEvent.query.filter_by(followed_id=user.id).order_by(db.desc(FollowEvent.event_date)).all()
+        events = []
+        for follow_event in follow_events:
+            follower = TwitterUser.query.filter_by(id=follow_event.follower_id).first()
+            if follower is not None:
+                events.append(EventDto(id=follow_event.id, user_screen_name=follower.screen_name,
+                                       user_name=follower.name, following=follow_event.following,
+                                       event_date=follow_event.event_date))
+        logging.info(events[0])
+        return events
 
     @staticmethod
     def get_followers(username: str):
@@ -14,7 +32,16 @@ class ApiService:
         return user.unfollowers
 
     @staticmethod
-    def get_follow_events(username: str, follower_id: int):
+    def get_follow_events_by_follower(username: str, follower_id: int):
         user = AppUser.query.filter_by(screen_name=username).one()
         events_list = FollowEvent.query.filter_by(followed_id=user.id, follower_id=follower_id).all()
         return events_list
+
+
+@dataclass
+class EventDto:
+    id: int
+    user_screen_name: str
+    user_name: str
+    following: bool
+    event_date: datetime
