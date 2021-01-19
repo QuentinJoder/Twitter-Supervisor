@@ -60,3 +60,9 @@ def callback():
     return redirect(url_for('pages.events'))
 
 
+@auth.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('pages.welcome'))
+
+

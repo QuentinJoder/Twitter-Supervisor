@@ -18,7 +18,7 @@ def events():
         events_list = ApiService.get_events(session['username'])
         return render_template('events.html', events=events_list)
     else:
-        redirect(url_for('welcome'))
+        return redirect(url_for('pages.welcome'))
 
 
 @pages.route('/followers')
@@ -26,7 +26,7 @@ def followers():
     if 'username' in session:
         return render_template('followers.html')
     else:
-        redirect(url_for('welcome'))
+        return redirect(url_for('pages.welcome'))
 
 
 @pages.route('/unfollowers')
@@ -34,7 +34,7 @@ def unfollowers():
     if 'username' in session:
         return render_template('followers.html')
     else:
-        redirect(url_for('welcome'))
+        return redirect(url_for('pages.welcome'))
 
 
 @pages.errorhandler(404)

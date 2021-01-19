@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block app_container %}
-<div class="container" id="app-content">
+<div class="container-fluid" id="app-content">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -15,6 +15,9 @@
                     <a class="nav-link" href="#">Account settings</a>
                 </div>
             </div>
+            <form class="form-inline" method="get" action="/auth/logout">
+                <button class="btn btn-danger" type="submit" value="">Logout</button>
+            </form>
         </div>
     </nav>
     {% block under_navbar %}{% endblock %}
