@@ -1,11 +1,13 @@
 from celery import Celery
 from celery.schedules import crontab
-from flask import Flask, render_template, session, url_for
+from flask import Flask
 from os import path, environ
 from sys import exit
 import logging
-from werkzeug.utils import redirect
 
+from .blueprints.auth import auth
+from .blueprints.api import api
+from .blueprints.pages import pages
 from .config import Config, ConfigException
 
 CONFIG_FILE = 'config.cfg'
@@ -45,27 +47,10 @@ def create_app(test_config=None):
     with app.app_context():
         db.create_all()
 
-    # Blueprints and routes (Avoid circular import)
-    from .blueprints.auth import auth_bp
-    from .blueprints.api import api_bp
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(api_bp)
-
-    @app.route('/')
-    @app.route('/welcome')
-    def welcome():
-        return render_template('welcome.html')
-
-    @app.route('/followers')
-    def followers():
-        if 'username' in session:
-            return render_template('followers.html')
-        else:
-            redirect(url_for('welcome'))
-
-    @app.errorhandler(404)
-    def page_not_found(error):
-        return render_template('error.html', error_message=error), 404
+    # Blueprints
+    app.register_blueprint(auth)
+    app.register_blueprint(api)
+    app.register_blueprint(pages)
 
     return app
 

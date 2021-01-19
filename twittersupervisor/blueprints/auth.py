@@ -4,12 +4,12 @@ import logging
 
 from twittersupervisor.services.auth_service import AuthService
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 oauth_store = {}
 
 
-@auth_bp.route('/request-token')
+@auth.route('/request-token')
 def request_token():
     callback_url = url_for('auth.callback', _external=True)
     logging.debug("App callback URL: {}".format(callback_url))
@@ -26,7 +26,7 @@ def request_token():
     return redirect(authorize_url)
 
 
-@auth_bp.route('/callback')
+@auth.route('/callback')
 def callback():
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')
@@ -57,6 +57,6 @@ def callback():
     auth.set_access_token(access_token, access_token_secret)
     user = AuthService.create_app_user(access_token=access_token, access_token_secret=access_token_secret)
     session['username'] = user.screen_name
-    return redirect(url_for('followers'))
+    return redirect(url_for('pages.followers'))
 
 

@@ -1,7 +1,7 @@
 const api_prefix = '/api'
 
 const vm = new Vue({
-    el: '#followers-accordion',
+    el: '#app-content',
     delimiters: ['[[', ']]'],
     data: {
         followers: [],
@@ -9,19 +9,26 @@ const vm = new Vue({
         target_follower: null,
     },
     created() {
-        this.getFollowers()
+        this.getUsers()
     },
     methods: {
-        getFollowers: async function (){
-            const response = await fetch(api_prefix + '/followers');
+        // API calls
+        getUsers: async function (){
+            const response = await fetch(api_prefix + window.location.pathname);
             const object = await response.json();
             this.followers = object;
         },
         getEvents: async function (followerId){
             const response = await fetch(api_prefix + '/followers/' + followerId + '/events');
             const object = await response.json();
-            console.log(object)
             this.events = object;
+        },
+        // Animation
+        active: function (page) {
+            if (page.localeCompare(window.location.pathname) ===  0) {
+                return 'active';
+            }
+            return '';
         },
         collapsed: function (followerId) {
             if (followerId.localeCompare(this.target_follower) !== 0) {
