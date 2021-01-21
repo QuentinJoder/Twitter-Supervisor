@@ -16,7 +16,7 @@
         <tr id="{{ event.id }}">
 <!--            <td>{{ event.id }}</td>-->
             <td>{{ event.event_date}}</td>
-            <td>{{ event.user_screen_name }}</td>
+            <td>@{{ event.user_screen_name }}</td>
             <td>{{ event.user_name }}</td>
             <td>{{ 'Follow' if event.following else 'Unfollow'}}</td>
         </tr>

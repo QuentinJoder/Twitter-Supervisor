@@ -1,0 +1,24 @@
+{% extends "navbar.html" %}
+{% block under_navbar %}
+<fieldset>
+    <legend>Account Settings</legend>
+    <p>
+        <label for="select-dm-option">
+            <input type="checkbox" value="">
+            Send a Direct Message to my Twitter account everytime someone
+        </label>
+        <select class="custom select" id="select-dm-option">
+            <option value="1">Follow or Unfollow me</option>
+            <option value="2">Unfollow me</option>
+            <option value="3">Follow Me</option>
+        </select>
+    </p>
+    <legend>Stop using Twitter Supervisor</legend>
+    <!--TODO add a dialog to confirm the revoke access operation-->
+    <p>
+        Click on that button if you want to leave Twitter Supervisor definitively. Attention, all the data collected about you
+        and your followers will be deleted, and this operation cannot be undone, even if you reuse the app in the future !
+    </p>
+    <button type="submit" class="btn btn-danger">Revoke Access</button>
+</fieldset>
+{% endblock %}

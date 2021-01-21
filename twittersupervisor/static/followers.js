@@ -1,5 +1,7 @@
 const api_prefix = '/api'
 
+// TODO Create a component for followers/unfollowers list
+
 const vm = new Vue({
     el: '#app-content',
     delimiters: ['[[', ']]'],
@@ -9,8 +11,9 @@ const vm = new Vue({
         target_follower: null,
     },
     created() {
-        if(window.location.pathname !== '/events') {
-            this.getUsers(window.location.pathname)
+        path = window.location.pathname;
+        if(path === '/followers' || path === '/unfollowers') {
+            this.getUsers(path);
         }
     },
     methods: {

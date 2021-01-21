@@ -37,6 +37,15 @@ def unfollowers():
         return redirect(url_for('pages.welcome'))
 
 
+@pages.route('/settings')
+def settings():
+    if 'username' in session:
+        # TODO get the settings from DB
+        return render_template('account_settings.html')
+    else:
+        return redirect(url_for('pages.welcome'))
+
+
 @pages.errorhandler(404)
 def page_not_found(error):
     return render_template('error.html', error_message=error), 404

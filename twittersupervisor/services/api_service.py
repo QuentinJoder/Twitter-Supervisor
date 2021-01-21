@@ -1,4 +1,3 @@
-import logging
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -18,7 +17,6 @@ class ApiService:
                 events.append(EventDto(id=follow_event.id, user_screen_name=follower.screen_name,
                                        user_name=follower.name, following=follow_event.following,
                                        event_date=follow_event.event_date))
-        logging.info(events[0])
         return events
 
     @staticmethod
