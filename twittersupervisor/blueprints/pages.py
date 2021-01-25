@@ -21,11 +21,12 @@ def events(page=1):
     else:
         return redirect(url_for('pages.welcome'))
 
-
+# TODO pagination of results
 @pages.route('/followers')
 def followers():
     if 'username' in session:
-        return render_template('followers.html')
+        followers_list = ApiService.get_followers(session['username'])
+        return render_template('followers.html', followers=followers_list)
     else:
         return redirect(url_for('pages.welcome'))
 
@@ -33,7 +34,8 @@ def followers():
 @pages.route('/unfollowers')
 def unfollowers():
     if 'username' in session:
-        return render_template('followers.html')
+        pagination = ApiService.get_unfollowers(session['username'])
+        return render_template('followers.html', followers=pagination)
     else:
         return redirect(url_for('pages.welcome'))
 
