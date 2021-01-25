@@ -13,10 +13,11 @@ def welcome():
 
 
 @pages.route('/events')
-def events():
+@pages.route('/events/<int:page>')
+def events(page=1):
     if 'username' in session:
-        events_list = ApiService.get_events(session['username'])
-        return render_template('events.html', events=events_list)
+        events_list, pagination = ApiService.get_events(session['username'], page)
+        return render_template('events.html', events=events_list, pagination=pagination)
     else:
         return redirect(url_for('pages.welcome'))
 

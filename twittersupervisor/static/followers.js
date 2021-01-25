@@ -12,7 +12,7 @@ const vm = new Vue({
     },
     created() {
         path = window.location.pathname;
-        if(path === '/followers' || path === '/unfollowers') {
+        if(path.startsWith('/followers') || path.startsWith('/unfollowers')) {
             this.getUsers(path);
         }
     },
@@ -30,7 +30,7 @@ const vm = new Vue({
         },
         // Animation
         active: function (page) {
-            if (page.localeCompare(window.location.pathname) ===  0) {
+            if (window.location.pathname.startsWith(page)) {
                 return 'active';
             }
             return '';
