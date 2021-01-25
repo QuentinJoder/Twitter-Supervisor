@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from flask import url_for
-
 from twittersupervisor.models import AppUser, FollowEvent, TwitterUser, db
 
 
 class ApiService:
 
-    ITEMS_PER_PAGE = 50
+    ITEMS_PER_PAGE = 50  # TODO Allow the user to choose the number of items per page
 
     @classmethod
     def get_events(cls, username: str, page: int):
@@ -24,15 +22,15 @@ class ApiService:
                                        event_date=follow_event.event_date))
         return events, pagination
 
-    @staticmethod
-    def get_followers(username: str):
+    @classmethod
+    def get_followers(cls, username: str, page: int):
         user = AppUser.query.filter_by(screen_name=username).one()
-        return user.followers
+        return user.followers.paginate(page=page, per_page=cls.ITEMS_PER_PAGE)
 
-    @staticmethod
-    def get_unfollowers(username: str):
+    @classmethod
+    def get_unfollowers(cls, username: str, page: int):
         user = AppUser.query.filter_by(screen_name=username).one()
-        return user.unfollowers
+        return user.unfollowers.paginate(page=page, per_page=cls.ITEMS_PER_PAGE)
 
     @staticmethod
     def get_follow_events_by_follower(username: str, follower_id: int):

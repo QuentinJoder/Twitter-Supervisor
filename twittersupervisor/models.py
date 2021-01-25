@@ -42,11 +42,13 @@ class AppUser(TwitterUser):
     followers: List[TwitterUser] = db.relationship('TwitterUser', secondary=followers,
                                                    primaryjoin="TwitterUser.id == followers.c.followed_id",
                                                    secondaryjoin="TwitterUser.id == followers.c.follower_id",
-                                                   backref='following')
+                                                   backref='following',
+                                                   lazy='dynamic')
     unfollowers: List[TwitterUser] = db.relationship('TwitterUser', secondary=unfollowers,
                                                      primaryjoin="TwitterUser.id == unfollowers.c.unfollowed_id",
                                                      secondaryjoin="TwitterUser.id == unfollowers.c.unfollower_id",
-                                                     backref='unfollowing')
+                                                     backref='unfollowing',
+                                                     lazy='dynamic')
 
     __mapper_args__ = {
         'polymorphic_identity': 'app_user'
