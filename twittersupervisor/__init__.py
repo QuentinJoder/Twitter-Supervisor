@@ -1,5 +1,3 @@
-from celery import Celery
-from celery.schedules import crontab
 from flask import Flask
 from os import path, environ
 from sys import exit
@@ -53,37 +51,3 @@ def create_app(test_config=None):
     app.register_blueprint(pages)
 
     return app
-
-
-def create_celery_app(app=None):
-    app = app or create_app()
-    celery = Celery(
-        app.import_name,
-        broker=app.config['CELERY_BROKER_URL'],
-        include=['twittersupervisor.tasks']
-    )
-    celery.conf.update(app.config)
-    celery.conf.beat_schedule = {
-        'check_followers': {
-            'task': 'twittersupervisor.tasks.check_app_users_followers',
-            'schedule': crontab(minute='*/15'),
-            'args': (),
-        },
-        'update_users_data': {
-            'task': 'twittersupervisor.tasks.update_users_data',
-            'schedule': crontab(minute='*/15'),
-            'args': (),
-        }
-    }
-    logging.debug(celery.conf.beat_schedule)
-
-    class ContextTask(celery.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
-
-
-celery = create_celery_app()
