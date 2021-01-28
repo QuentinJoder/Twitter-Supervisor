@@ -5,7 +5,6 @@ from enum import Enum
 from twittersupervisor.models import AppUser, TwitterUser, FollowEvent, db
 from twittersupervisor.twitter_api import TwitterApi
 
-
 logger = logging.getLogger()
 
 
@@ -120,12 +119,12 @@ class CheckFollowersService:
                 twitter_api.send_direct_message(username, message)
             elif hasattr(error, 'api_code') and error.api_code == 50:
                 traitor_name = cls._get_username(traitor)
-                cls.send_direct_message(username, 'One of your follower\'s account ({}) has been deleted'
-                                        .format(traitor_name), twitter_api)
+                twitter_api.send_direct_message(username, 'One of your follower\'s account ({}) has been deleted'
+                                                .format(traitor_name))
             elif hasattr(error, 'api_code') and error.api_code == 63:
                 traitor_name = cls._get_username(traitor)
-                cls.send_direct_message(username, 'One of your follower\'s account ({}) has been suspended'
-                                        .format(traitor_name), twitter_api)
+                twitter_api.send_direct_message(username, 'One of your follower\'s account ({}) has been suspended'
+                                                .format(traitor_name))
         return
 
     @staticmethod
