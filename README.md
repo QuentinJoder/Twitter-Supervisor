@@ -94,9 +94,9 @@ You can now run [tests](#Tests) to check if everything works and run the app !
     [Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode), run: `$ ./flask_run.sh development`
     
 *  Launch the celery workers (more info about that [here](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#starting-the-scheduler)):
-    - `celery -A twittersupervisor.tasks beat` to launch the scheduler
-    - `celery -A twittersupervisor.tasks worker` to launch a worker
-    - `celery -A twittersupervisor.tasks worker -B` useful in development, to launch one worker with the scheduler embedded.
+    - `celery -A twittersupervisor beat` to launch the scheduler
+    - `celery -A twittersupervisor worker` to launch a worker
+    - `celery -A twittersupervisor worker -B` useful in development, to launch one worker with the scheduler embedded.
 
 ### Tests
 in the project directory, simply run: 

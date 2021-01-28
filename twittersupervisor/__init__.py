@@ -59,7 +59,8 @@ def create_celery_app(app=None):
     app = app or create_app()
     celery = Celery(
         app.import_name,
-        broker=app.config['CELERY_BROKER_URL']
+        broker=app.config['CELERY_BROKER_URL'],
+        include=['twittersupervisor.tasks']
     )
     celery.conf.update(app.config)
     celery.conf.beat_schedule = {
@@ -84,3 +85,5 @@ def create_celery_app(app=None):
     celery.Task = ContextTask
     return celery
 
+
+celery = create_celery_app()

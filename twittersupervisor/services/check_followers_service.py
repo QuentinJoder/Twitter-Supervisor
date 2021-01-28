@@ -15,7 +15,7 @@ class CheckFollowersContext(Enum):
 
 class CheckFollowersService:
 
-    @classmethod
+    @classmethod  # TODO Manage quota of DMs and other API calls
     def check_followers(cls, username: str, context: str):
         context = CheckFollowersContext(context)
         user = AppUser.query.filter_by(screen_name=username).one()

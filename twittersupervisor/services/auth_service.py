@@ -12,4 +12,5 @@ class AuthService:
                        access_token=access_token, access_token_secret=access_token_secret)
         db.session.merge(user)
         db.session.commit()
+        # TODO Launch a 'check_followers' task if it is a new user
         return user
