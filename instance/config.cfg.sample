@@ -6,8 +6,8 @@ SECRET_KEY= b'...'
 APP_CONSUMER_KEY='aConsumerKey'
 APP_CONSUMER_SECRET='aConsumerSecret'
 
-# DATABASE (Twitter Supervisor uses an SQLite database)
-DATABASE_FILE='instance/twittersupervisor.db'
+# DB
+SQLALCHEMY_DATABASE_URI='sqlite:////absolute/path/to/Twitter-Supervisor/db.sqlite3'
 
 ## OPTIONAL
 # TWITTER CREDENTIALS (Needed if you want to run tests)
@@ -18,3 +18,9 @@ DEFAULT_USER='aUser'
 # LOGGING
 LOG_LEVEL='WARNING'
 LOG_FILE='twitter_supervisor.log'
+
+# DB
+SQLALCHEMY_TRACK_MODIFICATIONS='False'
+
+# SCHEDULER: See https://github.com/viniciuschiele/flask-apscheduler#api for more info
+SCHEDULER_API_ENABLED='False'

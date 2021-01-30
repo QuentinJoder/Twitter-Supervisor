@@ -41,7 +41,6 @@ class TestConfig:
                                   'DEFAULT_ACCESS_TOKEN': current_app.config['DEFAULT_ACCESS_TOKEN'],
                                   'DEFAULT_ACCESS_TOKEN_SECRET': current_app.config['DEFAULT_ACCESS_TOKEN_SECRET'],
                                   'DEFAULT_USER': current_app.config['DEFAULT_USER'],
-                                  'CELERY_BROKER_URL': current_app.config['CELERY_BROKER_URL'],
                                   'SQLALCHEMY_DATABASE_URI': "sdu", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
                 assert perfect_config == Config.check_config(perfect_config, "config.cfg")
                 assert perfect_config == Config.check_config(perfect_config, "ENV variables")
@@ -74,7 +73,7 @@ class TestConfig:
             # Verify_credentials should not be called
             vc_mock.reset_mock()
             test_config = {'SECRET_KEY': "sk", 'APP_CONSUMER_KEY': "ack", 'APP_CONSUMER_SECRET': "acs",
-                           'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_USER': "du", 'CELERY_BROKER_URL': 'cbu',
+                           'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_USER': "du",
                            'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'LOG_LEVEL': "DEBUG", 'LOG_FILE': "lf.log"}
             Config.check_config(test_config, "config.cfg")
             vc_mock.assert_not_called()
@@ -83,8 +82,8 @@ class TestConfig:
         # Perfect config
         test_config = {'SECRET_KEY': "sk", 'APP_CONSUMER_KEY': "ack", 'APP_CONSUMER_SECRET': "acs",
                        'DEFAULT_ACCESS_TOKEN': "dat", 'DEFAULT_ACCESS_TOKEN_SECRET': "dats", 'DEFAULT_USER': "du",
-                       'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'CELERY_BROKER_URL': 'cbu', 'LOG_LEVEL': "DEBUG",
-                       'LOG_FILE': "lf.log"}
+                       'SQLALCHEMY_DATABASE_URI': "db.sqlite3", 'LOG_LEVEL': "DEBUG",
+                       'LOG_FILE': "lf.log", 'SCHEDULER_API_ENABLED': 'False', 'SQLALCHEMY_TRACK_MODIFICATIONS': 'False'}
         for entry in test_config:
             monkeypatch.setenv(entry, test_config[entry])
         config = Config.get_config_from_env()

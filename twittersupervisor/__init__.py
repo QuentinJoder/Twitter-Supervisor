@@ -1,14 +1,22 @@
+from apscheduler.schedulers.base import STATE_RUNNING
 from flask import Flask
 from os import path, environ
 from sys import exit
 import logging
+import atexit
 
 from .blueprints.auth import auth
 from .blueprints.api import api
 from .blueprints.pages import pages
 from .config import Config, ConfigException
+from .tasks import scheduler
 
 CONFIG_FILE = 'config.cfg'
+
+
+def on_exit():
+    if scheduler.state == STATE_RUNNING:
+        scheduler.shutdown()
 
 
 def create_app(test_config=None):
@@ -49,5 +57,10 @@ def create_app(test_config=None):
     app.register_blueprint(auth)
     app.register_blueprint(api)
     app.register_blueprint(pages)
+
+    # Scheduler
+    scheduler.init_app(app)
+    scheduler.start()
+    atexit.register(on_exit)
 
     return app

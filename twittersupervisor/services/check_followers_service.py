@@ -93,7 +93,7 @@ class CheckFollowersService:
                 if friendship_info.connections['muting']:
                     message = message + ' You muted this user.'
                 twitter_api.send_direct_message(username, message)
-                user = TwitterUser(id=friendship_info.id, id_str=friendships_info.id_str,
+                user = TwitterUser(id=friendship_info.id, id_str=friendship_info.id_str,
                                    screen_name=friendship_info.screen_name, name=friendship_info.name)
                 db.session.merge(user)
             db.session.commit()

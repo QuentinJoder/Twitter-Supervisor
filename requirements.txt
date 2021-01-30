@@ -3,5 +3,4 @@ pytest
 tweepy
 Flask
 Flask-SQLAlchemy
-celery
-redis
+Flask-APScheduler

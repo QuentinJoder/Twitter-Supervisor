@@ -5,8 +5,8 @@ Twitter Supervisor informs you (via direct message) when someone follows or unfo
 your old tweets, retweets and favorites.
 
 Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [tweepy](https://www.tweepy.org/) and 
-[python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API. It uses the [celery](https://docs.celeryproject.org/en/stable/index.html)
-framework to manage periodic tasks and use [Redis](https://redis.io/) as a message broker.
+[python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API. It uses [Flask-APScheduler](https://github.com/viniciuschiele/flask-apscheduler)
+to manage periodic tasks.
 
 ![Build and Test](https://github.com/QuentinJoder/Twitter-Supervisor/workflows/build-and-test/badge.svg?branch=master)
 
@@ -16,7 +16,6 @@ framework to manage periodic tasks and use [Redis](https://redis.io/) as a messa
 
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
 
-* **Redis**
 
 ## How to run the app
 
@@ -57,8 +56,8 @@ There are two ways to give to the app the Twitter API credentials you created an
     APP_CONSUMER_KEY='aConsumerKey'
     APP_CONSUMER_SECRET='aConsumerSecret'
     
-    # DATABASE (Twitter Supervisor uses an SQLite database)
-    DATABASE_FILE='instance/twittersupervisor.db'
+    # DB
+    SQLALCHEMY_DATABASE_URI='sqlite:////absolute/path/to/Twitter-Supervisor/db.sqlite3'
     
     ## OPTIONAL
     # TWITTER CREDENTIALS (Needed if you want to run tests)
@@ -69,6 +68,12 @@ There are two ways to give to the app the Twitter API credentials you created an
     # LOGGING
     LOG_LEVEL='WARNING'
     LOG_FILE='twitter_supervisor.log'
+    
+    # DB
+    SQLALCHEMY_TRACK_MODIFICATIONS='False'
+    
+    # SCHEDULER: See https://github.com/viniciuschiele/flask-apscheduler#api for more info
+    SCHEDULER_API_ENABLED='False'
     ```
   
 2) Or define all the parameters above as environment variables with `export` in Linux (`SET` in Windows) before you run
@@ -83,21 +88,14 @@ or test the app:
 You can now run [tests](#Tests) to check if everything works and run the app !
 
 ### Run the app
-* Launch the redis server with: `$ redis-server`
-
-* Like a regular Flask application, launch Twitter-Supervisor with:
-    ```shell script
-    $ export FLASK_APP=twittersupervisor
-    $ flask run
-    ```
-    There is a `flask_run.sh` script in the project files which does that, and if you want to launch the live server in
-    [Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode), run: `$ ./flask_run.sh development`
+Like a regular Flask application, launch Twitter-Supervisor with:
+```shell script
+$ export FLASK_APP=twittersupervisor
+$ flask run
+```
+There is a `flask_run.sh` script in the project files which does that, and if you want to launch the live server in
+[Debug Mode](https://flask.palletsprojects.com/en/1.1.x/quickstart/#debug-mode), run: `$ ./flask_run.sh development`
     
-*  Launch the celery workers (more info about that [here](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#starting-the-scheduler)):
-    - `celery -A twittersupervisor.celery beat` to launch the scheduler
-    - `celery -A twittersupervisor.celery worker` to launch a worker
-    - `celery -A twittersupervisor.celery worker -B` useful in development, to launch one worker with the scheduler embedded.
-
 ### Tests
 in the project directory, simply run: 
 ```shell script
