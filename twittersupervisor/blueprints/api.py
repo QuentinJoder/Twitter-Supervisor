@@ -1,6 +1,6 @@
 from flask import Blueprint, session, jsonify
 from werkzeug.exceptions import abort
-from twittersupervisor.services import ApiService
+from twittersupervisor.services.api_service import ApiService
 
 api = Blueprint('api', __name__, url_prefix='/api')
 

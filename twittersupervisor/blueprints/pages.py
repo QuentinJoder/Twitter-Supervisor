@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, session, url_for, request
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
-from twittersupervisor.services import ApiService
+from twittersupervisor.services.api_service import ApiService
 
 pages = Blueprint(name='pages', import_name=__name__, url_prefix='/')
 

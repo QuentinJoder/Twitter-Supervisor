@@ -1,7 +1,9 @@
 import logging
 from flask_apscheduler import APScheduler
 
-from .services import AppUserService, UpdateDataService, CheckFollowersService, CheckFollowersContext
+from .services.app_user_service import AppUserService
+from .services.update_data_service import UpdateDataService
+from .services.check_followers_service import CheckFollowersService, CheckFollowersContext
 
 
 logger = logging.getLogger()

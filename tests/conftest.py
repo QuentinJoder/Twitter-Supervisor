@@ -1,7 +1,7 @@
 import pytest
 import os
 import tempfile
-from twittersupervisor import create_app
+from twittersupervisor import create_app, on_exit
 
 TWITTER_USER_ID = 783214
 
@@ -34,6 +34,7 @@ def app():
 
     yield app
 
+    on_exit()
     os.close(db_fd)
     os.unlink(db_path)
 
