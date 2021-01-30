@@ -17,7 +17,7 @@ to manage periodic tasks.
 * **A Twitter developer account** (a Standard one is good enough), you can apply [here](https://developer.twitter.com/en/apply-for-access).
 
 
-## How to run the app
+## How to run the app ?
 
 ### Twitter Developer Portal
 * Create a **Standalone app** in the [developer portal](https://developer.twitter.com/en/portal/projects-and-apps)
@@ -39,44 +39,16 @@ to manage periodic tasks.
 * Run `$ pip install -Ur requirements.txt` in the virtual environment to install dependencies.
 
 ### Configuration
-There are two ways to give to the app the Twitter API credentials you created and other config parameters:
+There are two ways to give to the app its configuration:
 
-1) Create a `config.cfg` file where you put the config keys:
+1) Use a `config.cfg` file where you put the config keys:
 
     There is already a skeleton called `config.cfg.sample` in the `/instance` folder that you can fill and rename.
-    By default, the app will look in this folder to get it, but you can put it elsewhere and tell Twitter-Supervisor
+    
+    By default, the app will look in this folder to get `config.cfg`, but you can put it elsewhere and tell Twitter-Supervisor
     where tho find it with `$ export FLASK_INSTANCE_PATH=/path/to/instance/folder`
-
-    ```properties
-    ## MANDATORY
-    # Required by flask.session, run `$ python -c 'import os; print(os.urandom(16))'` to get one
-    SECRET_KEY= b'...'
-    
-    # TWITTER API
-    APP_CONSUMER_KEY='aConsumerKey'
-    APP_CONSUMER_SECRET='aConsumerSecret'
-    
-    # DB
-    SQLALCHEMY_DATABASE_URI='sqlite:////absolute/path/to/Twitter-Supervisor/db.sqlite3'
-    
-    ## OPTIONAL
-    # TWITTER CREDENTIALS (Needed if you want to run tests)
-    DEFAULT_ACCESS_TOKEN='aUserAccessToken'
-    DEFAULT_ACCESS_TOKEN_SECRET='aUserAccessTokenSecret'
-    DEFAULT_USER='aUser'
-    
-    # LOGGING
-    LOG_LEVEL='WARNING'
-    LOG_FILE='twitter_supervisor.log'
-    
-    # DB
-    SQLALCHEMY_TRACK_MODIFICATIONS='False'
-    
-    # SCHEDULER: See https://github.com/viniciuschiele/flask-apscheduler#api for more info
-    SCHEDULER_API_ENABLED='False'
-    ```
   
-2) Or define all the parameters above as environment variables with `export` in Linux (`SET` in Windows) before you run
+2) Or define all the config parameters as environment variables with `export` in Linux (`SET` in Windows) before you run
 or test the app:
 
     ```shell script

@@ -4,13 +4,11 @@ instance/
 *.db
 *.sqlite3
 *.log
-dump.rdb
 drafts/
-celerybeat-schedule
 
 # Python
 virtualenv/
-venv/
+venv*
 __pycache__
 *.pyc
 
