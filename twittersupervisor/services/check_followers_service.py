@@ -44,7 +44,7 @@ class CheckFollowersService:
             if 0 < len(new_followers_set):
                 cls.__present_new_followers(user.screen_name, new_followers_set, twitter_api)
             if 0 < len(new_unfollowers_set):
-                cls._denounce_traitors(user.screen_name, new_unfollowers_set, twitter_api)
+                cls.__denounce_traitors(user.screen_name, new_unfollowers_set, twitter_api)
         elif context == CheckFollowersContext.FIRST_TIME:
             cls.__send_direct_message(twitter_api, user.screen_name, "Welcome in Twitter Supervisor {} !"
                                       .format(user.screen_name))
@@ -128,18 +128,18 @@ class CheckFollowersService:
         return
 
     @classmethod
-    def _denounce_traitors(cls, username: str, unfollowers_set: set, twitter_api: TwitterApi):
+    def __denounce_traitors(cls, username: str, unfollowers_set: set, twitter_api: TwitterApi):
         if len(unfollowers_set) > 10:
             cls.__send_direct_message(twitter_api, username,
                                       "Oops! More than 10 accounts unfollowed you during the last minute.")
             return
 
         for traitor in unfollowers_set:
-            friendships, error = twitter_api.get_friendship_show(username, traitor)
+            friendship, error = twitter_api.get_friendship_show(username, traitor)
             if error is None:
-                target_info = friendships[1]
+                target_info = friendship[0]
                 message = '@{} unfollowed you'.format(target_info.screen_name)
-                source_info = friendships[0]
+                source_info = friendship[1]
                 if source_info.blocking:
                     message = message + ' You blocked him/her.'
                 if source_info.blocked_by:
@@ -150,11 +150,11 @@ class CheckFollowersService:
                     message = message + ' You muted this user.'
                 cls.__send_direct_message(twitter_api, username, message)
             elif hasattr(error, 'api_code') and error.api_code == 50:
-                traitor_name = cls._get_username(traitor)
+                traitor_name = cls.__get_username(traitor)
                 cls.__send_direct_message(twitter_api, username, 'One of your follower\'s account ({}) has been deleted'
                                           .format(traitor_name))
             elif hasattr(error, 'api_code') and error.api_code == 63:
-                traitor_name = cls._get_username(traitor)
+                traitor_name = cls.__get_username(traitor)
                 cls.__send_direct_message(twitter_api, username,
                                           'One of your follower\'s account ({}) has been suspended'
                                           .format(traitor_name))

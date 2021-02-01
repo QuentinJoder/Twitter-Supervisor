@@ -1,9 +1,9 @@
 import pytest
 from time import sleep
-from tweepy.models import Relationship
-from twitter import User
+from tweepy.models import Relationship, User, Friendship
 from tweepy import DirectMessage
 from flask import current_app
+
 from twittersupervisor.twitter_api import TwitterApi
 from tests import conftest
 
@@ -39,6 +39,8 @@ class TestTwitterApi:
     def test_get_followers(self, twitter_api):
         followers_set = twitter_api.get_followers_set()
         assert isinstance(followers_set, set)
+        if len(followers_set) > 0:
+            assert isinstance(followers_set.pop(), int)
 
     @pytest.mark.api_call
     def test_get_user(self, twitter_api):
@@ -49,13 +51,33 @@ class TestTwitterApi:
         assert error is None
 
     @pytest.mark.api_call
+    def test_users_lookup(self, twitter_api):
+        users = twitter_api.get_users_lookup([conftest.TWITTER_USER_ID, conftest.LE_MONDE_USER_ID])
+        assert isinstance(users, list)
+        user = users[0]
+        assert isinstance(user, User)
+        assert user.screen_name == 'Twitter'
+
+    @pytest.mark.api_call
     def test_get_friendships_lookup(self, twitter_api):
-        friendships = twitter_api.get_friendships_lookup([conftest.TWITTER_USER_ID])
+        friendships = twitter_api.get_friendships_lookup([conftest.TWITTER_USER_ID, conftest.LE_MONDE_USER_ID])
         assert isinstance(friendships, list)
         friendship = friendships[0]
         assert isinstance(friendship, Relationship)
         assert friendship.name == 'Twitter'
         assert friendship.screen_name == 'Twitter'
+
+    @pytest.mark.api_call
+    def test_get_friendship_show(self, twitter_api, app):
+        with app.app_context():
+            username = current_app.config['DEFAULT_USER']
+            friendship, error = twitter_api.get_friendship_show(username, conftest.LE_MONDE_USER_ID)
+            print(friendship)
+            assert isinstance(friendship[0], Friendship)
+            assert isinstance(friendship[1], Friendship)
+            assert friendship[0].screen_name == username
+            assert friendship[1].screen_name == "lemondefr"
+            assert error is None
 
     @pytest.mark.api_call
     def test_send_message(self, twitter_api, app):

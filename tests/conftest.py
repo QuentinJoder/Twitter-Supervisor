@@ -4,6 +4,7 @@ import tempfile
 from twittersupervisor import create_app, on_exit
 
 TWITTER_USER_ID = 783214
+LE_MONDE_USER_ID = 24744541
 
 
 def pytest_addoption(parser):
