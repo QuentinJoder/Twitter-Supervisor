@@ -7,7 +7,6 @@ import logging
 # TODO Raise TwitterApiException for each method failure
 # TODO Stop using python-twitter because lib seem no longer maintained ?
 class TwitterApi:
-
     MAX_SCREEN_NAME_LENGTH = 15
     MAX_NAME_LENGTH = 50
     MAX_ID_STRING_LENGTH = 20
@@ -38,22 +37,19 @@ class TwitterApi:
         try:
             return self.api.CheckRateLimit(endpoint_url)
         except error.TwitterError as e:
-            logging.critical('An error happened when rate limit of endpoint {} was checked: {}'.format(endpoint_url, e.message))
-            return None
+            raise TwitterApiException(reason=e.message)
 
     def verify_credentials(self):
         try:
             return self.api.VerifyCredentials(skip_status=True)
-        except error.TwitterError as e:
-            logging.error('An error happened while checking the Twitter API credentials validity: {}'.format(e.message))
-            raise
+        except tweepy.TweepError as e:
+            raise TwitterApiException(reason=e.reason)
 
     def get_followers_set(self):
         try:
             return set(self.api.GetFollowerIDs())
         except error.TwitterError as e:
-            logging.critical('Twitter Supervisor is unable to get the user\'s followers IDs list: {}'.format(e.message))
-            raise
+            raise TwitterApiException(reason=e.message)
 
     def get_user(self, user_id):
         try:
@@ -62,12 +58,24 @@ class TwitterApi:
             logging.error('An error happened while searching for user n°{0}: {1}'.format(user_id, e.message))
             return None, e.message
 
-    MAX_USERS_LOOKUP_PER_WINDOW = 900
-    USER_IDS_PER_USERS_LOOKUP = 100
-
     def get_users_lookup(self, users_id):
+        max_users_lookup_per_window = 900
+        user_ids_per_users_lookup = 100
         try:
-            return self.tweepy_api.lookup_users(user_ids=users_id)
+            start = 0
+            end = user_ids_per_users_lookup
+            iterations = 0
+            twitter_users = []
+
+            while iterations < max_users_lookup_per_window and end < len(users_id):
+                twitter_users.extend(self.tweepy_api.lookup_users(user_ids=users_id[start:end]))
+                start = end
+                end += user_ids_per_users_lookup
+                iterations += 1
+            if iterations != max_users_lookup_per_window:
+                twitter_users.extend(self.tweepy_api.lookup_users(user_ids=users_id[start: len(users_id)]))
+
+            return twitter_users
         except tweepy.TweepError as e:
             raise TwitterApiException(reason=e.reason)
 
@@ -161,6 +169,30 @@ class TwitterApi:
                 deleted_items.append(deleted_item)
             logging.info('Delete {0} n°{1} from {2}'.format(items_type, items[i].id, items[i].user.screen_name))
         return deleted_items
+
+    # Static methods
+    @staticmethod
+    def get_authorize_url(callback_url: str) -> (str, dict):
+        try:
+            auth = tweepy.OAuthHandler(current_app.config['APP_CONSUMER_KEY'], current_app.config['APP_CONSUMER_SECRET']
+                                       , callback_url)
+            authorize_url = auth.get_authorization_url(signin_with_twitter=True)
+            return authorize_url, auth.request_token
+        except tweepy.TweepError as e:
+            raise TwitterApiException(e)
+
+    @staticmethod
+    def get_twitter_credentials(oauth_token: str, oauth_token_secret: str, oauth_verifier: str) -> (tweepy.models.User, str, str):
+        try:
+            auth = tweepy.OAuthHandler(current_app.config['APP_CONSUMER_KEY'],
+                                       current_app.config['APP_CONSUMER_SECRET'])
+            auth.request_token = {'oauth_token': oauth_token, 'oauth_token_secret': oauth_token_secret}
+            (access_token, access_token_secret) = auth.get_access_token(oauth_verifier)
+            auth.set_access_token(access_token, access_token_secret)
+            twitter_api = TwitterApi(access_token, access_token_secret)
+            return twitter_api.verify_credentials(), access_token, access_token_secret
+        except tweepy.TweepError as e:
+            raise TwitterApiException(reason=e.reason)
 
 
 class TwitterApiException(Exception):

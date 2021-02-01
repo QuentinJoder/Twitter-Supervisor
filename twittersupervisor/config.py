@@ -1,7 +1,6 @@
 import logging
 from os import environ
-from .twitter_api import TwitterApi
-from twitter import error
+from .twitter_api import TwitterApi, TwitterApiException
 
 
 class Config:
@@ -67,8 +66,8 @@ class Config:
                              config['APP_CONSUMER_KEY'], config['APP_CONSUMER_SECRET'])
             try:
                 api.verify_credentials()
-            except error.TwitterError as e:
-                raise ConfigException(e.message)
+            except TwitterApiException as e:
+                raise ConfigException(e.reason)
 
         # If debugging, log config
         # log_level = logging.getLogger().level

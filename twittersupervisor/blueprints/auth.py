@@ -11,11 +11,11 @@ oauth_store = {}
 def request_token():
     callback_url = url_for('auth.callback', _external=True)
     try:
-        oauth, authorize_url = AuthService.get_authorize_url(callback_url)
+        authorize_url, token = AuthService.get_authorize_url(callback_url)
     except AuthException as error:
         return render_template('error.html', error_message=error.reason)
-    oauth_token = oauth.request_token['oauth_token']
-    oauth_token_secret = oauth.request_token['oauth_token_secret']
+    oauth_token = token['oauth_token']
+    oauth_token_secret = token['oauth_token_secret']
     oauth_store[oauth_token] = oauth_token_secret
     return redirect(authorize_url)
 

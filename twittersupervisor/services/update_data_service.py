@@ -11,27 +11,15 @@ class UpdateDataService:
         for user in related_users:
             if user.screen_name is None:
                 unknown_users.append(user.id)
-        users_number = len(unknown_users)
-        if users_number == 0:
+
+        # Decide what to do
+        if len(unknown_users) == 0:
             return 0  # TODO Refresh users data regularly even if none is unknown
         users_id = unknown_users
 
-        # Setup
+        # Get users data
         twitter_api = TwitterApi(access_token=app_user.access_token, access_token_secret=app_user.access_token_secret)
-        start = 0
-        end = TwitterApi.USER_IDS_PER_USERS_LOOKUP
-        iterations = 0
-        twitter_users = []
-
-        # Collect users data
-        # TODO Catch and handle TwitterApi errors
-        while iterations < TwitterApi.MAX_USERS_LOOKUP_PER_WINDOW and end < users_number:
-            twitter_users.extend(twitter_api.get_users_lookup(users_id[start:end]))
-            start = end
-            end += TwitterApi.USER_IDS_PER_USERS_LOOKUP
-            iterations += 1
-        if iterations != TwitterApi.MAX_USERS_LOOKUP_PER_WINDOW:
-            twitter_users.extend(twitter_api.get_users_lookup(users_id[start: users_number]))
+        twitter_users = twitter_api.get_users_lookup(users_id)
 
         # Save it in DB
         for user in twitter_users:

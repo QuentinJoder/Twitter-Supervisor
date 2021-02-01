@@ -1,39 +1,32 @@
 import logging
 
-from flask import current_app
-from tweepy import OAuthHandler, TweepError
-
 from twittersupervisor.models import AppUser, db
-from twittersupervisor.twitter_api import TwitterApi
+from twittersupervisor.twitter_api import TwitterApi, TwitterApiException
 from .check_followers_service import CheckFollowersService, CheckFollowersContext
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
 
     @staticmethod
-    def get_authorize_url(callback_url: str) -> (OAuthHandler, str):
-        logging.debug("App callback URL: {}".format(callback_url))
-        auth = OAuthHandler(current_app.config['APP_CONSUMER_KEY'], current_app.config['APP_CONSUMER_SECRET'],
-                            callback_url)
+    def get_authorize_url(callback_url: str) -> (str, dict):
+        logger.debug("App callback URL: {}".format(callback_url))
         try:
-            authorize_url = auth.get_authorization_url(signin_with_twitter=True)
-        except TweepError as error:
-            logging.error(error)
-            raise AuthException(error)
-        return auth, authorize_url
+            authorize_url, request_token = TwitterApi.get_authorize_url(callback_url)
+        except TwitterApiException as e:
+            raise AuthException(reason=e.reason)
+        return authorize_url, request_token
 
     @classmethod
     def login(cls, oauth_token: str, oauth_token_secret: str, oauth_verifier: str) -> AppUser:
-        # Get access token and secret
-        auth = OAuthHandler(current_app.config['APP_CONSUMER_KEY'], current_app.config['APP_CONSUMER_SECRET'])
-        auth.request_token = {'oauth_token': oauth_token, 'oauth_token_secret': oauth_token_secret}
+        # Get user, access token and secret
         try:
-            (access_token, access_token_secret) = auth.get_access_token(oauth_verifier)
-            auth.set_access_token(access_token, access_token_secret)
-            twitter_api = TwitterApi(access_token, access_token_secret)
-            twitter_user = twitter_api.verify_credentials()
-        except TweepError as error:
-            logging.error(error)
+            (twitter_user, access_token, access_token_secret) = TwitterApi.get_twitter_credentials(oauth_token=oauth_token,
+                                                                                                   oauth_token_secret=oauth_token_secret,
+                                                                                                   oauth_verifier=oauth_verifier)
+        except TwitterApiException as error:
+            logger.error(error)
             raise AuthException(reason=error.reason)
 
         db_user = AppUser.query.filter_by(id=twitter_user.id).first()
