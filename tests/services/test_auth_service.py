@@ -52,6 +52,8 @@ class TestAuthService:
                     AuthService.login("token", "token_secret", "verifier")
                     merge_user_mock.assert_called_once()
                     check_followers_mock.assert_not_called()
+                    db.session.delete(user)
+                    db.session.commit()
 
     def test_merge_app_user(self, app):
         with app.app_context():
@@ -65,4 +67,7 @@ class TestAuthService:
             assert test_user.id_str == user.id_str
             assert test_user.access_token == user.access_token
             assert test_user.access_token_secret == user.access_token_secret
+            auser = AppUser.query.filter_by(id=user.id).one()
+            db.session.delete(auser)
+            db.session.commit()
 

@@ -4,6 +4,9 @@
 Twitter Supervisor informs you (via direct message) when someone follows or unfollows you. You can set it up to delete
 your old tweets, retweets and favorites.
 
+Important: currently, Twitter Supervisor cannot work if your account has more than 5000 followers. Compatibility with
+"bigger" accounts might be added in the future.
+
 Twitter-Supervisor is a [Flask](https://flask.palletsprojects.com/) app using [tweepy](https://www.tweepy.org/) and 
 [python-twitter](https://python-twitter.readthedocs.io/en/latest/) to access the Twitter API. It uses [Flask-APScheduler](https://github.com/viniciuschiele/flask-apscheduler)
 to manage periodic tasks.

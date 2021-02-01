@@ -33,7 +33,7 @@ class AuthService:
         # New user
         if db_user is None:
             db_user = cls.__merge_app_user(twitter_user, access_token, access_token_secret)
-            CheckFollowersService.check_followers(twitter_user.screen_name, CheckFollowersContext.FIRST_TIME.value)
+            CheckFollowersService.check_followers(twitter_user.screen_name, CheckFollowersContext.FIRST_TIME)
         # Existing user, but he changed his name and/or screen name
         elif (db_user.screen_name != twitter_user.screen_name) or (db_user.name != twitter_user.name):
             db_user = cls.__merge_app_user(twitter_user, access_token, access_token_secret)

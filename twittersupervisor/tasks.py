@@ -10,12 +10,12 @@ logger = logging.getLogger()
 scheduler = APScheduler()
 
 
-@scheduler.task('cron', id='CheckFollowers', minute='*/15')
+@scheduler.task('cron', id='CheckFollowers', minute='*/1')  # TODO Manage accounts with more than 5000 followers
 def check_app_users_followers():
     with scheduler.app.app_context():
         app_users = AppUserService.get_app_users()
         for user in app_users:
-            CheckFollowersService.check_followers(user.screen_name, CheckFollowersContext.PERIODIC_CHECK.value)
+            CheckFollowersService.check_followers(user.screen_name, CheckFollowersContext.PERIODIC_CHECK)
 
 
 @scheduler.task('cron', id='UpdateUserData', minute='*/15')

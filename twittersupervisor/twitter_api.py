@@ -33,12 +33,13 @@ class TwitterApi:
         auth.set_access_token(access_token, access_token_secret)
         self.tweepy_api = tweepy.API(auth)
 
-    def check_rate_limit(self, endpoint_url):
+    def rate_limit_status(self, resources: str):
         try:
-            return self.api.CheckRateLimit(endpoint_url)
-        except error.TwitterError as e:
-            raise TwitterApiException(reason=e.message)
+            return self.tweepy_api.rate_limit_status(resources=resources)
+        except tweepy.TweepError as e:
+            raise TwitterApiException(reason=e.reason)
 
+    # Users, friendships -----------------------------------------------------------------------------------------------
     def verify_credentials(self):
         try:
             return self.api.VerifyCredentials(skip_status=True)
@@ -79,12 +80,11 @@ class TwitterApi:
         except tweepy.TweepError as e:
             raise TwitterApiException(reason=e.reason)
 
-    def get_friendship_lookup(self, users_id):
+    def get_friendships_lookup(self, users_ids):
         try:
-            return self.api.LookupFriendship(users_id)
-        except error.TwitterError as e:
-            logging.critical('An error happened while looking up friendships: {}'.format(e.message))
-            raise
+            return self.tweepy_api.lookup_friendships(user_ids=users_ids)
+        except tweepy.TweepError as e:
+            raise TwitterApiException(reason=e.reason)
 
     def get_friendship_show(self, source_screen_name, target_id):
         try:
@@ -92,15 +92,14 @@ class TwitterApi:
         except tweepy.TweepError as e:
             return None, e
 
-    # For Direct Messages use tweepy because python-twitter is not up to date with endpoints changed in Sep. 2018
-    # https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/guides/direct-message-migration
+    # Direct Messages --------------------------------------------------------------------------------------------------
     def send_direct_message(self, sender_screen_name, text):
         logging.debug('Sending direct message: \"{}\"'.format(text))
         try:
             user = self.tweepy_api.get_user(screen_name=sender_screen_name)
             return self.tweepy_api.send_direct_message(text=text, recipient_id=user.id)
         except tweepy.TweepError as e:
-            raise TwitterApiException('Unable to send direct message: {}'.format(e.reason))
+            raise TwitterApiException(e.reason)
 
     def delete_direct_message(self, dm_id):
         try:
@@ -108,6 +107,7 @@ class TwitterApi:
         except tweepy.TweepError as e:
             raise TwitterApiException("Unable to delete direct message n°{}: {}".format(dm_id, e.reason))
 
+    # Tweets, timeline, favorites --------------------------------------------------------------------------------------
     def get_user_timeline(self, user_screen_name):
         try:
             return self.api.GetUserTimeline(screen_name=user_screen_name, count=200, since_id=20)
@@ -170,7 +170,7 @@ class TwitterApi:
             logging.info('Delete {0} n°{1} from {2}'.format(items_type, items[i].id, items[i].user.screen_name))
         return deleted_items
 
-    # Static methods
+    # Static methods----------------------------------------------------------------------------------------------------
     @staticmethod
     def get_authorize_url(callback_url: str) -> (str, dict):
         try:

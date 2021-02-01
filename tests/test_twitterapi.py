@@ -1,13 +1,14 @@
 import pytest
 from time import sleep
-from twitter import User, UserStatus
+from tweepy.models import Relationship
+from twitter import User
 from tweepy import DirectMessage
 from flask import current_app
 from twittersupervisor.twitter_api import TwitterApi
 from tests import conftest
 
 
-# The purpose of this test class is to check if the libraries used to access the Twitter API and the API endpoints are
+# The purpose of this test class is to check if the libraries used to access the Twitter API and the API itself are
 # still working as intended
 class TestTwitterApi:
 
@@ -19,6 +20,15 @@ class TestTwitterApi:
                               access_token_secret=config_dict['DEFAULT_ACCESS_TOKEN_SECRET'],
                               consumer_key=config_dict['APP_CONSUMER_KEY'],
                               consumer_secret=config_dict['APP_CONSUMER_SECRET'])
+
+    @pytest.mark.api_call
+    def test_rate_limit_status(self, twitter_api):
+        rate_limits = twitter_api.rate_limit_status('users,friendships,followers')
+        # Useful to know if the rate limits of the endpoints used by Twitter Supervisor have changed
+        assert rate_limits['resources']['followers']['/followers/ids']['limit'] == 15
+        assert rate_limits['resources']['friendships']['/friendships/lookup']['limit'] == 15
+        assert rate_limits['resources']['friendships']['/friendships/show']['limit'] == 180
+        assert rate_limits['resources']['users']['/users/lookup']['limit'] == 900
 
     @pytest.mark.api_call
     def test_verify_credentials(self, twitter_api):
@@ -39,11 +49,11 @@ class TestTwitterApi:
         assert error is None
 
     @pytest.mark.api_call
-    def test_get_friendship_lookup(self, twitter_api):
-        friendships = twitter_api.get_friendship_lookup([conftest.TWITTER_USER_ID])
+    def test_get_friendships_lookup(self, twitter_api):
+        friendships = twitter_api.get_friendships_lookup([conftest.TWITTER_USER_ID])
         assert isinstance(friendships, list)
         friendship = friendships[0]
-        assert isinstance(friendship, UserStatus)
+        assert isinstance(friendship, Relationship)
         assert friendship.name == 'Twitter'
         assert friendship.screen_name == 'Twitter'
 
