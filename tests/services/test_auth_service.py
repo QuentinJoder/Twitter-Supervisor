@@ -1,8 +1,7 @@
 from unittest.mock import patch
 
 from pytest import raises
-from tweepy import OAuthHandler, TweepError
-from twitter import User
+from tweepy import OAuthHandler, TweepError, User
 
 from twittersupervisor.models import AppUser, db
 from twittersupervisor.services.auth_service import AuthService, AuthException
@@ -23,7 +22,7 @@ class TestAuthService:
     def test_login(self, app, monkeypatch):
         # Monkey patch
         def mock_verify_credentials(*args):
-            return User(id=1, id_str="1", screen_name="test", name="Test")
+            return User.parse(None, json={'id': 1, 'id_str': "1", 'screen_name': "test", 'name': "Test"})
 
         def mock_get_access_token(*args):
             return 'access_token', 'access_token_secret'
@@ -59,7 +58,7 @@ class TestAuthService:
         with app.app_context():
             test_user = AppUser(id=2, id_str='2', screen_name='test2', name='Test 2', access_token='at',
                                 access_token_secret='ats')
-            twitter_user = User(id=2, id_str="2", screen_name="test2", name="Test 2")
+            twitter_user = User.parse(None, json={'id': 2, 'id_str': "2", 'screen_name': "test2", 'name': "Test 2"})
             user = AuthService._AuthService__merge_app_user(twitter_user, "at", "ats")
             assert test_user.id == user.id
             assert test_user.screen_name == user.screen_name
