@@ -3,9 +3,8 @@ from twittersupervisor.models import db, TwitterApi, TwitterUser, AppUser
 
 class UpdateDataService:
     @classmethod
-    def update_related_users_info(cls, username) -> int:
+    def update_related_users_info(cls, app_user: AppUser) -> int:
         # Get unknown users
-        app_user = AppUser.query.filter_by(screen_name=username).one()
         related_users = app_user.followers.all() + app_user.unfollowers.all()
         unknown_users = []
         for user in related_users:

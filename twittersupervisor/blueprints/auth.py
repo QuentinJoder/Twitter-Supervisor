@@ -47,7 +47,7 @@ def callback():
     except AuthException as error:
         return render_template('error.html', error_message=error.reason)
     session['username'] = user.screen_name
-    return redirect(url_for('pages.events'))
+    return redirect(url_for('pages.settings'))
 
 
 @auth.route('/logout')

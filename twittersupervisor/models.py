@@ -1,9 +1,11 @@
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 from typing import List
+from sqlalchemy.orm import backref
 
 from .twitter_api import TwitterApi
-import datetime
-from dataclasses import dataclass
 
 db = SQLAlchemy()
 
@@ -15,6 +17,7 @@ class TwitterUser(db.Model):
     id_str: str = db.Column(db.String(TwitterApi.MAX_ID_STRING_LENGTH))
     screen_name: str = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH), unique=True)
     name: str = db.Column(db.String(TwitterApi.MAX_NAME_LENGTH))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     type = db.Column(db.String(50))
 
     __mapper_args__ = {
@@ -54,8 +57,6 @@ class AppUser(TwitterUser):
         'polymorphic_identity': 'app_user'
     }
 
-    # TODO Create a Model for Settings
-
 
 @dataclass
 class FollowEvent(db.Model):
@@ -64,4 +65,20 @@ class FollowEvent(db.Model):
     followed_id: int = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     follower_id: int = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), nullable=False)
     following: bool = db.Column(db.Boolean, nullable=False)
-    event_date: datetime.datetime = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    event_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class DirectMessageOption(Enum):
+    FOLLOW_AND_UNFOLLOW = 1
+    UNFOLLOW = 2
+    FOLLOW = 3
+    NO_MESSAGES = 4
+
+
+@dataclass
+class Settings(db.Model):
+    __tablename__ = 'settings'
+    user_id: int = db.Column(db.Integer, db.ForeignKey('twitter_user.id'), primary_key=True)
+    user: AppUser = db.relationship("AppUser", backref=backref("settings", uselist=False))
+    dm_option: DirectMessageOption = db.Column(db.Enum(DirectMessageOption), nullable=False,
+                                               default=DirectMessageOption.FOLLOW_AND_UNFOLLOW)

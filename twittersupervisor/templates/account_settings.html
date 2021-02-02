@@ -2,17 +2,20 @@
 {% block under_navbar %}
 <fieldset>
     <legend>Account Settings</legend>
-    <p>
-        <label for="select-dm-option">
-            Send a Direct Message to my Twitter account everytime someone
-        </label>
-        <select class="custom select" id="select-dm-option">
-            <option value="1">Follow or Unfollow me</option>
-            <option value="2">Unfollow me</option>
-            <option value="3">Follow Me</option>
-            <option value="4">Don't send any message</option>
-        </select>
-    </p>
+    <form action="" method="post">
+        <p>
+            <label for="select-dm-option">
+                Send a Direct Message to my Twitter account everytime someone
+            </label>
+            <select class="custom select" id="select-dm-option" name="dm-option">
+                {% for key, value in dm_options.items() %}
+                <option value="{{key.value}}" {%if key==settings.dm_option %} selected {% endif %}>{{value}}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+    <hr>
     <legend>Stop using Twitter Supervisor</legend>
     <!--TODO add a dialog to confirm the revoke access operation-->
     <p>

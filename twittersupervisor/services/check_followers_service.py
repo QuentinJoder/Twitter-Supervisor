@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 from enum import Enum
 
-from twittersupervisor.models import AppUser, TwitterUser, FollowEvent, db
+from twittersupervisor.models import AppUser, TwitterUser, FollowEvent, db, Settings
 from twittersupervisor.twitter_api import TwitterApi, TwitterApiException
 
 logger = logging.getLogger()
@@ -16,9 +16,9 @@ class CheckFollowersContext(Enum):
 class CheckFollowersService:
 
     @classmethod
-    def check_followers(cls, username: str, context: CheckFollowersContext):
+    def check_followers(cls, settings: Settings, context: CheckFollowersContext):
         # Setup
-        user = AppUser.query.filter_by(screen_name=username).one()
+        user = settings.user
         logger.info("Check the followers of: @{0}".format(user.screen_name, user.id))
         twitter_api = TwitterApi(access_token=user.access_token, access_token_secret=user.access_token_secret)
 
@@ -26,7 +26,7 @@ class CheckFollowersService:
         rate_limit_status = twitter_api.rate_limit_status('followers')
         remaining_followers_ids = rate_limit_status['resources']['followers']['/followers/ids']['remaining']
         if remaining_followers_ids == 0:
-            logger.warning("Abort 'check_followers' of @{} to respect rate limit of GET followers/ids".format(username))
+            logger.warning("Abort 'check_followers' of @{} to respect rate limit of GET followers/ids".format(user.screen_name))
             return
 
         # Get users sets and update DB
@@ -34,12 +34,14 @@ class CheckFollowersService:
             (new_followers_set, new_unfollowers_set) = cls._get_users_sets(twitter_api, user)
         except TwitterApiException as e:
             logger.error("Could not get current followers list of {0}, abort 'check_followers' because of error: {1}"
-                         .format(username, e.reason))
+                         .format(user.screen_name, e.reason))
             return
         cls._update_followers_and_unfollowers(user, new_followers_set, new_unfollowers_set)
         cls._create_follow_events(user.id, new_followers_set, new_unfollowers_set)
 
-        # Send Direct Messages TODO Add a dm_quota field in Settings
+        # TODO Add a direct message quota
+        # TODO Act accordingly with settings
+        # Send Direct Messages
         if context == CheckFollowersContext.PERIODIC_CHECK:
             if 0 < len(new_followers_set):
                 cls.__present_new_followers(user.screen_name, new_followers_set, twitter_api)
